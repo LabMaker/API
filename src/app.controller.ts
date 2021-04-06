@@ -1,19 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { AppService, TypeTest } from './app.service';
-
-export class MessageDto {
-  content: string;
-  submittedBy: string;
-}
 
 @Controller()
 export class AppController {
@@ -28,5 +14,15 @@ export class AppController {
   @HttpCode(204)
   insertId(@Body() body) {
     return this.appService.insertId(body);
+  }
+
+  @Get('config')
+  getConfig() {
+    return this.appService.getConfig();
+  }
+
+  @Post('updateConfig')
+  updateConfig(@Body() body) {
+    return this.appService.updateConfig(body);
   }
 }

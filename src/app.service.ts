@@ -3,7 +3,6 @@ export class TypeTest {
   ids: [string];
   constructor(ids2) {
     this.ids = ids2;
-    console.log('Created');
   }
 }
 
@@ -24,6 +23,21 @@ export class AppService {
     require('fs').writeFileSync(
       'src/utils/submissionIds.json',
       JSON.stringify(currentSubs, null, 1),
+    );
+    return HttpStatus.ACCEPTED;
+  }
+
+  getConfig() {
+    var json = JSON.parse(
+      require('fs').readFileSync('src/utils/config.json', 'utf8'),
+    );
+    return json;
+  }
+
+  updateConfig(body) {
+    require('fs').writeFileSync(
+      'src/utils/config.json',
+      JSON.stringify(body, null, 1),
     );
     return HttpStatus.ACCEPTED;
   }
