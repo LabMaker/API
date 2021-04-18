@@ -5,6 +5,7 @@ export interface IBotService {
 
   getLogs();
   createLog(log: LogDetails);
+
   getConfig();
   updateConfig(ConfigDto: configDetails);
 }
