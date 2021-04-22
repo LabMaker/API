@@ -25,14 +25,20 @@ export class BotService implements IBotService {
   getLogs(): Promise<Logs[]> {
     return this.logRepository.find();
   }
+
   createLog(LogDto: LogDetails) {
     return this.logRepository.insert(LogDto);
   }
+
   getConfig(): Promise<Config[]> {
     return this.configRepository.find();
   }
 
   updateConfig(ConfigDto: configDetails) {
     return this.configRepository.update(ConfigDto.id, ConfigDto);
+  }
+
+  updateMessage(Message: string) {
+    return this.configRepository.update(1, { pmBody: Message });
   }
 }

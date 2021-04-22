@@ -8,4 +8,5 @@ export interface IBotService {
 
   getConfig();
   updateConfig(ConfigDto: configDetails);
+  updateMessage(Message: String);
 }
