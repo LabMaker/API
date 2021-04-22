@@ -38,7 +38,7 @@ export class BotService implements IBotService {
     return this.configRepository.update(ConfigDto.id, ConfigDto);
   }
 
-  updateMessage(Message: string) {
-    return this.configRepository.update(1, { pmBody: Message });
+  updateMessage(pmBody: string) {
+    return this.configRepository.update(1, { pmBody: pmBody });
   }
 }

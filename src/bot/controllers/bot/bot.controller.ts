@@ -38,6 +38,6 @@ export class BotController {
   @Post('updateMessage')
   @HttpCode(200)
   updateMessage(@Body() Message): String {
-    return this.botService.updateMessage(Message);
+    return this.botService.updateMessage(Message.pmBody);
   }
 }
