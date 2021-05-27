@@ -13,7 +13,7 @@ import { entities } from './typeorm';
       host: '213.48.11.122',
       port: 3306,
       username: 'reditBot',
-      password: 'SXyV4%ZRjThvfW!d%LM!X9%9DtaLMg#r',
+      password: 'V8RiyIl6L2rEzAKO3Ip1daTIhITO4e',
       database: 'redit_bot',
       entities: entities,
       synchronize: true,
