@@ -23,7 +23,8 @@ export class BotService implements IBotService {
   }
 
   getLogs(): Promise<Logs[]> {
-    return this.logRepository.find();
+    // Only return latest 250 rows
+    return this.logRepository.find({ take: 250, order: { id: 'DESC' } });
   }
 
   createLog(LogDto: LogDetails) {
