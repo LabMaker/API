@@ -24,7 +24,7 @@ export class BotService implements IBotService {
 
   getLogs(): Promise<Logs[]> {
     // Only return latest 250 rows
-    return this.logRepository.find({ take: 250, order: { id: 'ASC' } });
+    return this.logRepository.find({ take: 250, order: { id: 'DESC' } });
   }
 
   createLog(LogDto: LogDetails) {
