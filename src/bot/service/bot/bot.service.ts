@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { configDetails, LogDetails } from 'src/bot/types/types';
-import { Config } from 'src/typeorm';
-import { Logs } from 'src/typeorm';
+import { Config, DiscordConfig, Logs } from 'src/typeorm';
 import { Repository } from 'typeorm';
 import { IBotService } from './Bot';
 
@@ -11,6 +10,8 @@ export class BotService implements IBotService {
   constructor(
     @InjectRepository(Config) private configRepository: Repository<Config>,
     @InjectRepository(Logs) private logRepository: Repository<Logs>,
+    @InjectRepository(DiscordConfig)
+    private discordConfigRepository: Repository<DiscordConfig>,
   ) {}
 
   async getSubmissions(): Promise<Logs[]> {
@@ -33,6 +34,10 @@ export class BotService implements IBotService {
 
   getConfig(): Promise<Config[]> {
     return this.configRepository.find();
+  }
+
+  getDiscordConfig(): Promise<DiscordConfig[]> {
+    return this.discordConfigRepository.find();
   }
 
   updateConfig(ConfigDto: configDetails) {

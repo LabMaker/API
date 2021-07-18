@@ -7,6 +7,7 @@ export interface IBotService {
   createLog(log: LogDetails);
 
   getConfig();
+  getDiscordConfig();
   updateConfig(ConfigDto: configDetails);
   updateMessage(pmBody: String);
 }

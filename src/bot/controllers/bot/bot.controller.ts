@@ -30,6 +30,10 @@ export class BotController {
     return this.botService.getConfig();
   }
 
+  @Get('discordConfig')
+  getDiscordConfig() {
+    return this.botService.getDiscordConfig();
+  }
   @Post('updateConfig')
   updateConfig(@Body() ConfigDto): configDetails {
     return this.botService.updateConfig(ConfigDto);

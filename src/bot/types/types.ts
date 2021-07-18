@@ -19,4 +19,22 @@ export type configDetails = {
   pmBody: string;
   subreddits: string;
   forbiddenWords: string;
+  activity: string;
+  type: string;
+  status: string;
+  imageUrl: string;
+  autoSwitch: boolean;
+  autoTicket: boolean;
+  autoReact: boolean;
+};
+
+export type discordConfigDetails = {
+  id: number;
+  activity: string;
+  type: string;
+  status: string;
+  imageUrl: string;
+  autoSwitch: boolean;
+  autoTicket: boolean;
+  autoReact: boolean;
 };
