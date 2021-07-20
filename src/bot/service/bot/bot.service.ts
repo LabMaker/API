@@ -46,11 +46,8 @@ export class BotService implements IBotService {
 
   updatePayments(paymentDto: PaymentDetails) {
     this.paymentRepository.delete({});
-    console.log(paymentDto);
     Object.entries(paymentDto).forEach(([key, data]) => {
       let payment = JSON.parse(JSON.stringify(data));
-      console.log(payment);
-      console.log(payment.id, payment.name, payment.value, payment.type);
       this.paymentRepository.insert({
         name: payment.name,
         value: payment.value,
