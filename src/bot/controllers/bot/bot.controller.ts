@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Post } from '@nestjs/common';
 import { IBotService } from 'src/bot/service/bot/Bot';
-import { configDetails, LogDetails } from 'src/bot/types/types';
+import { configDetails, LogDetails, PaymentDetails } from 'src/bot/types/types';
 import { Config } from 'src/typeorm';
 
 @Controller('bot')
@@ -30,10 +30,16 @@ export class BotController {
     return this.botService.getConfig();
   }
 
-  @Get('discordConfig')
-  getDiscordConfig() {
-    return this.botService.getDiscordConfig();
+  @Get('payments')
+  getPayments() {
+    return this.botService.getPayments();
   }
+
+  @Post('updatePayments')
+  updatePayments(@Body() PaymentsDto): PaymentDetails {
+    return this.botService.updatePayments(PaymentsDto);
+  }
+
   @Post('updateConfig')
   updateConfig(@Body() ConfigDto): configDetails {
     return this.botService.updateConfig(ConfigDto);

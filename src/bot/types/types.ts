@@ -1,3 +1,10 @@
+export type PaymentDetails = {
+  id: number;
+  name: string;
+  value: string;
+  type: string;
+};
+
 export type LogDetails = {
   id: number;
   username: string;

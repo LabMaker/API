@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { configDetails, LogDetails } from 'src/bot/types/types';
-import { Config, DiscordConfig, Logs } from 'src/typeorm';
+import { configDetails, LogDetails, PaymentDetails } from 'src/bot/types/types';
+import { Config, Logs, Payments } from 'src/typeorm';
 import { Repository } from 'typeorm';
 import { IBotService } from './Bot';
 
@@ -10,8 +10,8 @@ export class BotService implements IBotService {
   constructor(
     @InjectRepository(Config) private configRepository: Repository<Config>,
     @InjectRepository(Logs) private logRepository: Repository<Logs>,
-    @InjectRepository(DiscordConfig)
-    private discordConfigRepository: Repository<DiscordConfig>,
+    @InjectRepository(Payments)
+    private paymentRepository: Repository<Payments>,
   ) {}
 
   async getSubmissions(): Promise<Logs[]> {
@@ -36,12 +36,28 @@ export class BotService implements IBotService {
     return this.configRepository.find();
   }
 
-  getDiscordConfig(): Promise<DiscordConfig[]> {
-    return this.discordConfigRepository.find();
-  }
-
   updateConfig(ConfigDto: configDetails) {
     return this.configRepository.update(ConfigDto.id, ConfigDto);
+  }
+
+  getPayments(): Promise<Payments[]> {
+    return this.paymentRepository.find();
+  }
+
+  updatePayments(paymentDto: PaymentDetails) {
+    this.paymentRepository.delete({});
+    console.log(paymentDto);
+    Object.entries(paymentDto).forEach(([key, data]) => {
+      let payment = JSON.parse(JSON.stringify(data));
+      console.log(payment);
+      console.log(payment.id, payment.name, payment.value, payment.type);
+      this.paymentRepository.insert({
+        name: payment.name,
+        value: payment.value,
+        type: payment.type,
+      });
+    });
+    return;
   }
 
   updateMessage(pmBody: string) {

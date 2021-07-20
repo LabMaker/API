@@ -1,4 +1,4 @@
-import { configDetails, LogDetails } from 'src/bot/types/types';
+import { configDetails, LogDetails, PaymentDetails } from 'src/bot/types/types';
 
 export interface IBotService {
   getSubmissions();
@@ -7,7 +7,9 @@ export interface IBotService {
   createLog(log: LogDetails);
 
   getConfig();
-  getDiscordConfig();
+  getPayments();
+
   updateConfig(ConfigDto: configDetails);
   updateMessage(pmBody: String);
+  updatePayments(paymentDto: PaymentDetails);
 }
