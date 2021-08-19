@@ -1,25 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { BotModule } from './bot/bot.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { entities } from './typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
+import { DiscordModule } from './discord/discord.module';
+import { RedditModule } from './reddit/reddit.module';
 
 @Module({
   imports: [
-    BotModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: '213.48.11.122',
-      port: 3306,
-      username: 'reditBot',
-      password: 'V8RiyIl6L2rEzAKO3Ip1daTIhITO4e',
-      database: 'redit_bot',
-      entities: entities,
-      synchronize: true,
-    }),
+    MongooseModule.forRoot(
+      'mongodb+srv://botuser:ZaCkbBpKRuNWq4QK@discord.6ajie.mongodb.net/LabMakerDev',
+    ),
+    DiscordModule,
+    RedditModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
