@@ -17,6 +17,7 @@ export class LogsService implements ILog {
     return await this.logRepository
       .find({
         nodeId,
+        pm: true,
       })
       .sort({ createdAt: -1 })
       .limit(250);
