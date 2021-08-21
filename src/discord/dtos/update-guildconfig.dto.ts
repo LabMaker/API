@@ -17,13 +17,13 @@ export class UpdateConfigDto {
 
   @IsOptional()
   @IsBoolean()
-  autoSwitcher: Boolean;
+  autoSwitcher: boolean;
 
   @IsOptional()
   @IsBoolean()
-  autoTicket: Boolean;
+  autoTicket: boolean;
 
   @IsOptional()
   @IsBoolean()
-  autoReact: Boolean;
+  autoReact: boolean;
 }

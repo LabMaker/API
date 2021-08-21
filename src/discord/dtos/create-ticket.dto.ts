@@ -36,5 +36,5 @@ export class CreateTicketDto {
 
   @IsOptional()
   @IsBoolean()
-  submitted: Boolean;
+  submitted: boolean;
 }

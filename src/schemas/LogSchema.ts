@@ -29,7 +29,7 @@ export class Log {
   subreddit: string;
 
   @Prop({ required: true })
-  pm: Boolean;
+  pm: boolean;
 }
 
 export const LogSchema = SchemaFactory.createForClass(Log);

@@ -32,7 +32,7 @@ export class Ticket {
   budget: string;
 
   @Prop({ default: false })
-  submitted: Boolean;
+  submitted: boolean;
 }
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);

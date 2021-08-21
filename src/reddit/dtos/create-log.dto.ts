@@ -20,5 +20,5 @@ export class CreateLogDto {
   subreddit: string;
 
   @IsBoolean()
-  pm: Boolean;
+  pm: boolean;
 }

@@ -24,13 +24,13 @@ export class DiscordConfig {
   paymentConfigId: string;
 
   @Prop({ default: false })
-  autoSwitcher: Boolean;
+  autoSwitcher: boolean;
 
   @Prop({ default: false })
-  autoTicket: Boolean;
+  autoTicket: boolean;
 
   @Prop({ default: false })
-  autoReact: Boolean;
+  autoReact: boolean;
 }
 
 export const DiscordConfigSchema = SchemaFactory.createForClass(DiscordConfig);
