@@ -38,6 +38,9 @@ export class RedditConfig {
 
   @Prop()
   forbiddenWords: string[];
+
+  @Prop()
+  blockedUsers: string[];
 }
 
 export const RedditConfigSchema = SchemaFactory.createForClass(RedditConfig);

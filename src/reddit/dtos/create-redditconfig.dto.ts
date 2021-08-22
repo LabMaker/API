@@ -34,4 +34,8 @@ export class CreateConfigDto {
   @IsOptional()
   @IsString({ each: true })
   forbiddenWords: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  blockedUsers: string[];
 }
