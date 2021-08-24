@@ -7,6 +7,9 @@ export class User {
   @Prop()
   _id: string;
 
+  @Prop()
+  nodes: string[];
+
   @Prop({ required: true, unique: true })
   discordId: string;
 

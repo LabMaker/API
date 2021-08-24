@@ -1,8 +1,6 @@
 import { DiscordConfig } from '../../schemas/DiscordConfigSchema';
-import { CreateConfigDto, Guild } from '../dtos/create-guildconfig.dto';
+import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
-import { Observable } from 'rxjs';
-import { AxiosResponse } from 'axios';
 
 export interface IDiscordConfig {
   getConfig(id: string): Promise<DiscordConfig>;
@@ -11,5 +9,4 @@ export interface IDiscordConfig {
   updateConfig(
     updateConfigDto: UpdateConfigDto,
   ): Promise<DiscordConfig> | Promise<null>;
-  fetchGuilds(accessToken: string): Observable<AxiosResponse<Guild[]>>;
 }

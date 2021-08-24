@@ -3,14 +3,13 @@ import { NestFactory } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { AppModule } from './app.module';
-import connectRedis from 'connect-redis';
+import * as connectRedis from 'connect-redis';
 import { redis } from './redis';
 
 // import * as discordStrategy from './strategies/discordstrategy';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   const RedisStore = connectRedis(session);
   // var RedisStore = require('connect-redis')(session);
   app.enableCors();

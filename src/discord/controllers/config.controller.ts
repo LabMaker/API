@@ -9,6 +9,7 @@ import {
   Put,
   ExecutionContext,
   Req,
+  ConsoleLogger,
 } from '@nestjs/common';
 import { DiscordConfig } from '../../schemas/DiscordConfigSchema';
 import { IDiscordConfig } from '../interfaces/config.interface';
@@ -21,8 +22,9 @@ import { Request } from 'express';
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
-    console.log(context);
-    // return ctx.getContext().req.user;
+    const request = context.switchToHttp().getRequest();
+    if (!request.session.passport) return null;
+    return request.session.passport.user;
   },
 );
 
@@ -41,14 +43,6 @@ export class ConfigController {
   @Get()
   async getConfigs() {
     return this.configService.getConfigs();
-  }
-
-  @Get('/test/guilds')
-  async getGuilds(@Req() request: Request) {
-    // return this.configService.fetchGuilds();
-    console.log(request.session);
-    return;
-    //return this.configService.fetchGuilds('1234');
   }
 
   @Post()

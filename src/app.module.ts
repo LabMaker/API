@@ -4,6 +4,7 @@ import { DiscordModule } from './discord/discord.module';
 import { RedditModule } from './reddit/reddit.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 let envFilePath = '.env.development';
 console.log(`Running in ${process.env.ENVIRONMENT}`);
@@ -21,6 +22,7 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
     DiscordModule,
     RedditModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
