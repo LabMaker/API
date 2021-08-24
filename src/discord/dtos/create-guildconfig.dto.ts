@@ -27,3 +27,21 @@ export class CreateConfigDto {
   @IsBoolean()
   autoReact: boolean;
 }
+
+export type Guild = {
+  id: string;
+  name: string;
+  icon?: string;
+  description?: string;
+  banner?: string;
+  owner_id?: string;
+  roles?: Role[];
+};
+
+export type Role = {
+  id: string;
+  name: string;
+  permissions: string;
+  position: number;
+  color: number;
+};

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   DiscordConfig,
   DiscordConfigDocument,
@@ -6,15 +6,33 @@ import {
 import { IDiscordConfig } from '../interfaces/config.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
+import { CreateConfigDto, Guild } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
+import { AxiosResponse } from 'axios';
+import { map, Observable } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class ConfigService implements IDiscordConfig {
   constructor(
+    @Inject(HttpService) private readonly httpService: HttpService,
     @InjectModel(DiscordConfig.name)
     private guildConfigRepository: Model<DiscordConfigDocument>,
   ) {}
+
+  fetchGuilds(accessToken: string): Observable<AxiosResponse<Guild[]>> {
+    const data = this.httpService
+      .get('http://discord.com/api/v8/users/@me/guilds', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .pipe(map((response) => response.data));
+
+    console.log(data);
+
+    return data;
+  }
 
   async getConfig(_id: string): Promise<DiscordConfig> {
     return await this.guildConfigRepository.findOne({
