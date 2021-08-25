@@ -6,11 +6,16 @@ import {
   Param,
   Post,
   Put,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { DiscordConfig } from '../../schemas/DiscordConfigSchema';
 import { IDiscordConfig } from '../interfaces/config.interface';
 import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from '../../utils/getUser.decorator';
+import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
 
 @Controller('discord/config')
 export class ConfigController {
@@ -19,8 +24,14 @@ export class ConfigController {
     private readonly configService: IDiscordConfig,
   ) {}
 
+  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  getConfig(@Param('id') id: string): Promise<DiscordConfig> {
+  getConfig(
+    @Param('id') id: string,
+    @CurrentUser() req: any,
+  ): Promise<DiscordConfig> {
+    console.log(req);
     return this.configService.getConfig(id);
   }
 
