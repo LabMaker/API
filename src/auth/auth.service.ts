@@ -15,7 +15,7 @@ export class AuthService {
 
   async validateUser(details: UserDetails) {
     const { _id } = details;
-    const user = await this.userRepo.findById(_id);
+    let user = await this.userRepo.findById(_id);
 
     if (user) {
       await this.userRepo.findByIdAndUpdate(_id, details, {
@@ -23,30 +23,23 @@ export class AuthService {
         useFindAndModify: false,
       });
     } else {
-      this.createUser(details);
+      user = await this.createUser(details);
     }
-    console.log(details.tokenVersion);
     const refreshToken = this.createRefreshToken(user, 'user');
-    console.log(refreshToken);
-    // console.log(jwt);
-
     return refreshToken;
   }
 
   async createUser(details: UserDetails) {
-    const createdUser = new this.userRepo({
-      ...details,
-    });
+    const createdUser = new this.userRepo(details);
     return await createdUser.save();
   }
 
-  async findUser(discordId: string): Promise<User | undefined> {
-    return await this.userRepo.findOne({ discordId });
+  async findUser(_id: string): Promise<User | undefined> {
+    return await this.userRepo.findById(_id);
   }
 
   async refreshToken(res: Response, req: Request) {
     const token = req.cookies.jid;
-    console.log(token);
 
     if (!token) {
       return res.send({ ok: false, accessToken: '' });
@@ -60,7 +53,6 @@ export class AuthService {
     }
 
     const user: User = await this.userRepo.findById(payload.sub);
-    console.log(user);
 
     if (!user) {
       return res.send({ ok: false, accessToken: '' });
@@ -107,7 +99,7 @@ export class AuthService {
         discriminator: user.discriminator,
         type: type,
       },
-      { secret: 'jwtSecret', expiresIn: '30s' },
+      { secret: 'jwtSecret', expiresIn: '15m' },
     );
   }
 }

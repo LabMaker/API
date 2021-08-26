@@ -6,8 +6,10 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { RedditConfig } from '../../schemas/RedditConfigSchema';
+import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
@@ -19,6 +21,7 @@ export class ConfigController {
   ) {}
 
   @Get('/:id')
+  @UseGuards(JwtAuthGuard)
   getConfig(@Param('id') id: string): Promise<RedditConfig> {
     return this.configService.getConfig(id);
   }

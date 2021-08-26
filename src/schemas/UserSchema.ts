@@ -7,7 +7,7 @@ export class User {
   @Prop()
   _id: string;
 
-  @Prop()
+  @Prop({ default: [] })
   nodes: string[];
 
   @Prop({ required: true })
