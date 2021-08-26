@@ -1,18 +1,50 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
+import {
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
+import { DiscordAuthGuard } from './guards/DiscordAuth.guard';
+import { AuthenticationProvider } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    @Inject('AUTH_SERVICE')
+    private readonly authService: AuthenticationProvider,
+  ) {}
 
-  @Post('local/signin')
-  signinLocal(@Body() dto: AuthDto) {
-    return this.authService.signinLocal(dto);
+  @Get('login')
+  @UseGuards(DiscordAuthGuard)
+  login() {}
+
+  @Get('redirect')
+  @UseGuards(DiscordAuthGuard)
+  redirect(@Res() res: Response) {
+    res.cookie('jid', res.req.user, {
+      httpOnly: true,
+      path: '/auth/refresh_token',
+    });
+    res.redirect('http://localhost:3001');
   }
 
-  @Post('local/signup')
-  signupLocal(@Body() dto: AuthDto) {
-    return this.authService.signupLocal(dto);
+  @Post('refresh_token')
+  refreshToken(@Res() res: Response, @Req() req: Request) {
+    console.log('REFRESHING');
+    return this.authService.refreshToken(res, req);
   }
+
+  // @Post('local/signin')
+  // signinLocal(@Body() dto: AuthDto) {
+  //   return this.authService.signinLocal(dto);
+  // }
+
+  // @Post('local/signup')
+  // signupLocal(@Body() dto: AuthDto) {
+  //   return this.authService.signupLocal(dto);
+  // }
 }

@@ -10,9 +10,6 @@ export class User {
   @Prop()
   nodes: string[];
 
-  @Prop({ required: true, unique: true })
-  discordId: string;
-
   @Prop({ required: true })
   username: string;
 
@@ -27,6 +24,9 @@ export class User {
 
   @Prop()
   refreshToken: string;
+
+  @Prop({ default: 0 })
+  tokenVersion: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,18 +1,35 @@
-// import { Strategy } from 'passport-discord';
-// import { PassportStrategy } from '@nestjs/passport';
-// import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Profile, Strategy } from 'passport-discord';
+import { PassportStrategy } from '@nestjs/passport';
+import { Inject, Injectable, Res } from '@nestjs/common';
+import { AuthenticationProvider } from '../auth.interface';
+import { Response } from 'express';
 
-// @Injectable()
-// export class LocalStrategy extends PassportStrategy(Strategy) {
-//   constructor(private authService: AuthService) {
-//     super();
-//   }
+@Injectable()
+export class DiscordStrategy extends PassportStrategy(Strategy) {
+  constructor(
+    @Inject('AUTH_SERVICE')
+    private readonly authService: AuthenticationProvider,
+  ) {
+    super({
+      clientID: process.env.DISCORD_CLIENT_ID,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET,
+      callbackURL: process.env.DISCORD_CALLBACK_URL,
+      scope: ['identify', 'guilds'],
+    });
+  }
 
-//   async validate(username: string, password: string): Promise<any> {
-//     const user = await this.authService.validateUser(username, password);
-//     if (!user) {
-//       throw new UnauthorizedException();
-//     }
-//     return user;
-//   }
-// }
+  async validate(accessToken: string, refreshToken: string, profile: Profile) {
+    const { username, discriminator, id: discordId, avatar } = profile;
+    const details = {
+      _id: discordId,
+      username,
+      discriminator,
+      avatar,
+      accessToken,
+      refreshToken,
+    };
+
+    const jwtToken = await this.authService.validateUser(details);
+    return jwtToken;
+  }
+}
