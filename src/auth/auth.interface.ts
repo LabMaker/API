@@ -7,4 +7,5 @@ export interface AuthenticationProvider {
   createUser(details: UserDetails);
   findUser(discordId: string): Promise<User | undefined>;
   refreshToken(res: Response, req: Request);
+  createBotToken();
 }

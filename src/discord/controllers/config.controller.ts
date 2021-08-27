@@ -27,11 +27,7 @@ export class ConfigController {
   // @UseGuards(AuthGuard('jwt'))
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  getConfig(
-    @Param('id') id: string,
-    @CurrentUser() req: any,
-  ): Promise<DiscordConfig> {
-    console.log(req);
+  getConfig(@Param('id') id: string): Promise<DiscordConfig> {
     return this.configService.getConfig(id);
   }
 

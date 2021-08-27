@@ -37,6 +37,11 @@ export class AuthController {
     return this.authService.refreshToken(res, req);
   }
 
+  @Get('bot_token')
+  botToken() {
+    return this.authService.createBotToken();
+  }
+
   // @Post('local/signin')
   // signinLocal(@Body() dto: AuthDto) {
   //   return this.authService.signinLocal(dto);

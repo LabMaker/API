@@ -13,7 +13,6 @@ export class LogsService implements ILog {
   ) {}
 
   async getLogs(nodeId: string): Promise<Log[]> {
-    console.log(nodeId);
     return await this.logRepository
       .find({
         nodeId,

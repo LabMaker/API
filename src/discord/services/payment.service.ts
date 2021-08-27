@@ -5,7 +5,6 @@ import { Payment, PaymentDocument } from '../../schemas/PaymentSchema';
 import { CreatePaymentDto } from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { Console } from 'console';
 
 @Injectable()
 export class PaymentService implements IPaymentService {
@@ -57,9 +56,7 @@ export class PaymentService implements IPaymentService {
     return map;
   }
 
-  deletePayments(deleteIds: string[]) {
-    deleteIds.map(async (_id) => {
-      await this.paymentRepository.deleteOne({ _id });
-    });
+  async deletePayments(deleteIds: string[]) {
+    await this.paymentRepository.deleteMany({ _id: { $in: deleteIds } });
   }
 }

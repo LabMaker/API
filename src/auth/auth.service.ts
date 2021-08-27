@@ -38,6 +38,12 @@ export class AuthService {
     return await this.userRepo.findById(_id);
   }
 
+  async createBotToken() {
+    const botToken = this.createBotAccessToken();
+    console.log(botToken);
+    return;
+  }
+
   async refreshToken(res: Response, req: Request) {
     const token = req.cookies.jid;
 
@@ -100,6 +106,16 @@ export class AuthService {
         type: type,
       },
       { secret: 'jwtSecret', expiresIn: '15m' },
+    );
+  }
+
+  private createBotAccessToken() {
+    return this.jwtService.sign(
+      {
+        sub: '10019',
+        type: 'Bot',
+      },
+      { secret: 'jwtSecret', expiresIn: '1y' },
     );
   }
 }

@@ -33,13 +33,6 @@ export class TicketService implements ITicketService {
   }
 
   async updateConfig(updateTicketDto: CreateTicketDto): Promise<any> {
-    // const filter = {
-    //   ticketId: updateTicketDto.ticketId,
-    //   serverId: updateTicketDto.serverId,
-    // };
-
-    console.log(updateTicketDto);
-
     const filter = { _id: updateTicketDto._id };
 
     return await this.ticketRepository.findOneAndUpdate(
