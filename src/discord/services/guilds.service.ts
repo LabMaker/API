@@ -26,7 +26,7 @@ export class GuildsService implements IGuild {
     console.log(userDetails.accessToken);
 
     const fetchedGuilds = this.httpService.get(
-      'http://discord.com/api/v8/users/@me/guilds',
+      'https://discord.com/api/v9/users/@me/guilds',
       {
         headers: {
           Authorization: `Bearer ${userDetails.accessToken}`,

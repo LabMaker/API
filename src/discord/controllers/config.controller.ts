@@ -6,15 +6,12 @@ import {
   Param,
   Post,
   Put,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { DiscordConfig } from '../../schemas/DiscordConfigSchema';
 import { IDiscordConfig } from '../interfaces/config.interface';
 import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser } from '../../utils/getUser.decorator';
 import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
 
 @Controller('discord/config')

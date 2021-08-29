@@ -29,9 +29,7 @@ export class ConfigService implements IRedditConfig {
     newConfig: CreateConfigDto,
     user: UserDetails,
   ): Promise<RedditConfig> {
-    console.log('running');
     newConfig._id = uuidv4();
-    console.log(user._id);
     try {
       const createdConfig = new this.redditConfigRepository(newConfig);
       const savedUser = await createdConfig.save();

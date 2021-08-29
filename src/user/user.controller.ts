@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Req, UseGuards } from '@nestjs/common';
 import { UserDetails } from '../auth/userDetails.dto';
 import { CurrentUser } from '../utils/getUser.decorator';
 import { JwtAuthGuard } from '../utils/guards/Jwt.guard';
@@ -12,6 +12,7 @@ export class UserController {
   @Get('')
   @UseGuards(JwtAuthGuard)
   getUser(@CurrentUser() user: UserDetails): Promise<UserDto> {
-    return this.userService.getUser(user._id);
+    console.log(user);
+    return this.userService.getUser(user);
   }
 }

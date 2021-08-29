@@ -11,7 +11,7 @@ export class UserDto {
   discriminator: string;
 
   @IsString()
-  avatar: string;
+  avatar: string | null;
 
   @IsString({ each: true })
   nodes: string[];

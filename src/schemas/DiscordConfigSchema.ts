@@ -12,6 +12,12 @@ export class DiscordConfig {
   @Prop()
   _id: string;
 
+  @Prop()
+  name: string;
+
+  @Prop()
+  icon: string;
+
   @Prop({ default: '?' })
   prefix: string;
 
