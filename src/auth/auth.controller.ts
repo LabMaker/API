@@ -26,9 +26,11 @@ export class AuthController {
   @UseGuards(DiscordAuthGuard)
   redirect(@Res() res: Response) {
     res.cookie('jid', res.req.user, {
-      httpOnly: true,
-      path: '/auth/refresh_token',
       sameSite: 'none',
+      httpOnly: true,
+      signed: false,
+      secure: false,
+      path: '/auth/refresh_token',
     });
     res.redirect(process.env.FRONT_END_URL);
   }
