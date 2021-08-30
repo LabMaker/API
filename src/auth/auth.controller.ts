@@ -28,7 +28,7 @@ export class AuthController {
     res.cookie('jid', res.req.user, {
       httpOnly: true,
       path: '/auth/refresh_token',
-      sameSite: false,
+      sameSite: 'none',
     });
     res.redirect(process.env.FRONT_END_URL);
   }
