@@ -8,6 +8,7 @@ export type UserDetails = {
   accessToken: string;
   refreshToken: string;
   tokenVersion?: number;
+  type: string;
 };
 
 export type Done = (err: Error, user: User) => void;

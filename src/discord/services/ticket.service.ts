@@ -28,6 +28,7 @@ export class TicketService implements ITicketService {
 
   async createTicket(newTicketDto: CreateTicketDto): Promise<Ticket> {
     newTicketDto._id = uuidv4();
+    console.log('creating');
     const createdTicket = new this.ticketRepository(newTicketDto);
     return await createdTicket.save();
   }

@@ -4,6 +4,7 @@ import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
 
 export interface IRedditConfig {
   getConfig(id: string): Promise<RedditConfig>;
+  getConfigs(user: UserDetails): Promise<RedditConfig[]>;
   createConfig(
     guildConfigDto: CreateConfigDto,
     user: UserDetails,

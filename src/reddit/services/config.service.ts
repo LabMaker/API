@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +23,13 @@ export class ConfigService implements IRedditConfig {
     return await this.redditConfigRepository.findOne({
       _id,
     });
+  }
+
+  async getConfigs(user: UserDetails): Promise<RedditConfig[]> {
+    if (user.type !== 'Bot') throw new UnauthorizedException();
+    console.log('IM IN');
+
+    return await this.redditConfigRepository.find();
   }
 
   async createConfig(

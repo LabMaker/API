@@ -86,7 +86,7 @@ export class AuthService {
     });
   }
 
-  createRefreshToken(user: UserDetails, type: string) {
+  createRefreshToken(user: User, type: string) {
     return this.jwtService.sign(
       {
         sub: user._id,
@@ -97,7 +97,7 @@ export class AuthService {
     );
   }
 
-  createAccessToken(user: UserDetails, type: string) {
+  createAccessToken(user: User, type: string) {
     return this.jwtService.sign(
       {
         sub: user._id,

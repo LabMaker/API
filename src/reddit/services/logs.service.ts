@@ -32,7 +32,7 @@ export class LogsService implements ILog {
 
     let submissionIds = [];
 
-    logs.map((log) => {
+    logs.forEach((log) => {
       submissionIds.push(log.subId);
     });
 

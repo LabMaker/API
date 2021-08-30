@@ -41,7 +41,7 @@ export class UserService {
     };
   }
 
-  async getUserDetails(id: string): Promise<UserDetails> {
+  async getUserDetails(id: string): Promise<User> {
     const user = await this.userRepo.findById(id);
 
     return user;

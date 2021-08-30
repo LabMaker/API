@@ -29,6 +29,12 @@ export class ConfigController {
     return this.configService.getConfig(id);
   }
 
+  @Get('')
+  @UseGuards(JwtAuthGuard)
+  getAll(@CurrentUser() user: UserDetails): Promise<RedditConfig[]> {
+    return this.configService.getConfigs(user);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   createConfig(
