@@ -29,7 +29,7 @@ export class AuthController {
       httpOnly: true,
       path: '/auth/refresh_token',
     });
-    res.redirect('http://localhost:3001');
+    res.redirect(process.env.FRONT_END_URL);
   }
 
   @Post('refresh_token')
