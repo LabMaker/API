@@ -47,6 +47,9 @@ export class AuthService {
   async refreshToken(res: Response, req: Request) {
     const token = req.cookies.jid;
 
+    console.log('Refresh Token - Auth Service');
+    console.log(token);
+
     if (!token) {
       return res.send({ ok: false, accessToken: '' });
     }
@@ -76,7 +79,9 @@ export class AuthService {
     });
 
     res.cookie('jid', this.createRefreshToken(updatedUser, 'user'), {
+      sameSite: 'none',
       httpOnly: true,
+      secure: true,
       path: '/auth/refresh_token',
     });
 

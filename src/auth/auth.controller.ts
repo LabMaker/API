@@ -36,6 +36,7 @@ export class AuthController {
 
   @Post('refresh_token')
   refreshToken(@Res() res: Response, @Req() req: Request) {
+    console.log(req.cookies);
     return this.authService.refreshToken(res, req);
   }
 
