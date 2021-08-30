@@ -9,12 +9,14 @@ import {
 import { LogsService } from './services/logs.service';
 import { LogsController } from './controllers/logs.controller';
 import { Log, LogSchema } from '../schemas/LogSchema';
+import { User, UserSchema } from '../schemas/UserSchema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: RedditConfig.name, schema: RedditConfigSchema },
       { name: Log.name, schema: LogSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
   providers: [

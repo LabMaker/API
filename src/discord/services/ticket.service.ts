@@ -28,18 +28,12 @@ export class TicketService implements ITicketService {
 
   async createTicket(newTicketDto: CreateTicketDto): Promise<Ticket> {
     newTicketDto._id = uuidv4();
+    console.log('creating');
     const createdTicket = new this.ticketRepository(newTicketDto);
     return await createdTicket.save();
   }
 
   async updateConfig(updateTicketDto: CreateTicketDto): Promise<any> {
-    // const filter = {
-    //   ticketId: updateTicketDto.ticketId,
-    //   serverId: updateTicketDto.serverId,
-    // };
-
-    console.log(updateTicketDto);
-
     const filter = { _id: updateTicketDto._id };
 
     return await this.ticketRepository.findOneAndUpdate(

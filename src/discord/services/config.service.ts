@@ -27,12 +27,14 @@ export class ConfigService implements IDiscordConfig {
   }
 
   async createConfig(newConfig: CreateConfigDto): Promise<DiscordConfig> {
+    newConfig.paymentConfigId = newConfig._id;
     const createdConfig = new this.guildConfigRepository(newConfig);
     return await createdConfig.save();
   }
 
   async updateConfig(updateConfigDto: UpdateConfigDto): Promise<any> {
     const filter = { _id: updateConfigDto._id };
+
     return await this.guildConfigRepository.findOneAndUpdate(
       filter,
       updateConfigDto,

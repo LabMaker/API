@@ -13,7 +13,6 @@ export class LogsService implements ILog {
   ) {}
 
   async getLogs(nodeId: string): Promise<Log[]> {
-    console.log(nodeId);
     return await this.logRepository
       .find({
         nodeId,
@@ -33,7 +32,7 @@ export class LogsService implements ILog {
 
     let submissionIds = [];
 
-    logs.map((log) => {
+    logs.forEach((log) => {
       submissionIds.push(log.subId);
     });
 
