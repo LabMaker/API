@@ -7,9 +7,8 @@ export class Payment {
   @Prop()
   _id: string;
 
-  //No Nodes Implemented as of right now so Default Node is always 0
   @Prop({ default: 0, required: true })
-  nodeId: string;
+  serverId: string;
 
   @Prop({ required: true })
   name: string;

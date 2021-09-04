@@ -16,9 +16,7 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath }),
-    MongooseModule.forRoot(
-      'mongodb+srv://botuser:ZaCkbBpKRuNWq4QK@discord.6ajie.mongodb.net/LabMakerDev',
-    ),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     DiscordModule,
     RedditModule,
     AuthModule,

@@ -11,6 +11,7 @@ import {
 import { Guild } from '../dtos/Guild.dto';
 import { UserService } from '../../user/user.service';
 import { IGuild } from '../interfaces/guild.interface';
+import { Payment, PaymentDocument } from '../../schemas/PaymentSchema';
 
 @Injectable()
 export class GuildsService implements IGuild {
@@ -19,6 +20,8 @@ export class GuildsService implements IGuild {
     @Inject(HttpService) private readonly httpService: HttpService,
     @InjectModel(DiscordConfig.name)
     private guildConfigRepository: Model<DiscordConfigDocument>,
+    @InjectModel(Payment.name)
+    private paymentRepository: Model<PaymentDocument>,
   ) {}
 
   async fetchGuilds(user: UserDetails): Promise<Guild[]> {
@@ -68,5 +71,18 @@ export class GuildsService implements IGuild {
     );
 
     return validGuilds;
+  }
+
+  async getLocalData(serverId: string): Promise<any> {
+    const config = await this.guildConfigRepository.findOne({
+      _id: serverId,
+    });
+
+    const payments = await this.paymentRepository.find({ serverId });
+
+    return {
+      config,
+      payments,
+    };
   }
 }

@@ -20,8 +20,8 @@ export class PaymentController {
   ) {}
 
   @Get('/:id')
-  getPayments(@Param('id') nodeId: string): Promise<Payment[]> {
-    return this.paymentService.getPayments(nodeId);
+  getPayments(@Param('id') serverId: string): Promise<Payment[]> {
+    return this.paymentService.getPayments(serverId);
   }
 
   @Post()

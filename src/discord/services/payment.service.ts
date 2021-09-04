@@ -13,8 +13,8 @@ export class PaymentService implements IPaymentService {
     private paymentRepository: Model<PaymentDocument>,
   ) {}
 
-  async getPayments(nodeId: string): Promise<Payment[]> {
-    const filter = { nodeId };
+  async getPayments(serverId: string): Promise<Payment[]> {
+    const filter = { serverId };
 
     return await this.paymentRepository.find(filter);
   }

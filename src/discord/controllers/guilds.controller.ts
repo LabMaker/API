@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { Guild } from '../dtos/Guild.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
@@ -16,5 +16,11 @@ export class GuildsController {
   @UseGuards(JwtAuthGuard)
   async getGuilds(@CurrentUser() user: UserDetails): Promise<Guild[]> {
     return this.guildService.fetchGuilds(user);
+  }
+
+  @Get('/:id')
+  @UseGuards(JwtAuthGuard)
+  async getLocalData(@Param('id') id: string) {
+    return this.guildService.getLocalData(id);
   }
 }
