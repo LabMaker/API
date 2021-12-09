@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { Log } from '../../schemas/LogSchema';
 import { CreateLogDto } from '../dtos/create-log.dto';
 import { ILog } from '../interfaces/log.interface';
+
+export type LogQueryParms = {
+  pmOnly: boolean;
+};
 
 @Controller('reddit/log')
 export class LogsController {
@@ -11,6 +23,18 @@ export class LogsController {
   getLog(@Param('id') nodeId: string): Promise<Log[]> {
     return this.logService.getLogs(nodeId);
   }
+
+  //Test & Finish Later
+  // @Get('/:id')
+  // async getQueryParms(
+  //   @Param('id') nodeId: string,
+  //   @Query() q: LogQueryParms,
+  //   @Query('pmOnly') l: boolean,
+  // ) {
+  //   console.log(l);
+  //   console.log(q.pmOnly);
+  //   return this.logService.queryGetLogs(nodeId, q);
+  // }
 
   @Get('submissions/:id')
   getSubmissions(@Param('id') nodeId: string): Promise<string[]> {

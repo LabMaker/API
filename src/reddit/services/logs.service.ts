@@ -5,6 +5,7 @@ import { Log, LogDocument } from '../../schemas/LogSchema';
 import { CreateLogDto } from '../dtos/create-log.dto';
 import { ILog } from '../interfaces/log.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { LogQueryParms } from '../controllers/logs.controller';
 
 @Injectable()
 export class LogsService implements ILog {
@@ -18,6 +19,21 @@ export class LogsService implements ILog {
         nodeId,
         pm: true,
       })
+      .sort({ createdAt: -1 })
+      .limit(250);
+  }
+
+  async queryGetLogs(nodeId: string, query: LogQueryParms): Promise<Log[]> {
+    console.log(query);
+    let filter: any = { nodeId };
+    if (query.pmOnly) {
+      console.log(query.pmOnly);
+      filter = { ...filter, pm: true };
+    }
+    
+    console.log(filter);
+    return await this.logRepository
+      .find(filter)
       .sort({ createdAt: -1 })
       .limit(250);
   }
