@@ -5,9 +5,10 @@ import { RedditModule } from './reddit/reddit.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { PayModule } from './pay/pay.module';
 
 let envFilePath = '.env.development';
-console.log(`Running in ${process.env.ENVIRONMENT}`);
+console.log(`Running in ${process.env.ENVIRONMENT || 'DEV'}`);
 
 if (process.env.ENVIRONMENT === 'PRODUCTION') {
   envFilePath = '.env';
@@ -21,6 +22,7 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
     RedditModule,
     AuthModule,
     UserModule,
+    PayModule,
   ],
   controllers: [],
   providers: [],

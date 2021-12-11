@@ -31,6 +31,7 @@
     "@nestjs/passport": "^8.0.1",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/typeorm": "^8.0.2",
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "@types/passport-discord": "^0.1.4",
     "apollo-server-express": "^2.25.2",
     "class-transformer": "^0.4.0",
