@@ -5,10 +5,13 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import * as paypal from '@paypal/checkout-server-sdk';
+import { PayGateway } from './pay.gateway';
 
 @Injectable()
 export class PayPalService {
   private client = new paypal.core.PayPalHttpClient(this.environment());
+
+  constructor(private readonly payGateway: PayGateway) {}
 
   private get credentials() {
     if (process.env.ENVIRONMENT === 'PRODUCTION') {
@@ -134,22 +137,42 @@ export class PayPalService {
       this.captureOrder(oinfo.id);
     }
 
-    // Order processed
-    // if (ev.event_type == 'CHECKOUT.ORDER.COMPLETED') {
-    //   let oinfo = ev.resource;
-    //   let amount = oinfo.gross_amount;
+    // Checkout completed, but funds are still processing!
+    if (ev.event_type == 'CHECKOUT.ORDER.COMPLETED') {
+      let oinfo = ev.resource;
+      let amount = oinfo.gross_amount;
 
-    //   console.log(`Some1 paid ${amount.value} ${amount.currency_code}`);
-    // }
+      console.log(
+        `Payment of ${amount.value} ${amount.currency_code} is **processing**.`,
+      );
+    }
 
-    // Captured funds
+    // Funds have been captured from the payee, payment process fully completed
     if (ev.event_type == 'PAYMENT.CAPTURE.COMPLETED') {
       let oinfo = ev.resource;
-      let paidBreakdown = oinfo.seller_receivable_breakdown;
+      let breakdown = oinfo.seller_receivable_breakdown;
 
-      console.log('paypal_fee: ', paidBreakdown.paypal_fee);
-      console.log('gross_amount: ', paidBreakdown.gross_amount);
-      console.log('net_amount: ', paidBreakdown.net_amount);
+      console.log('paypal_fee: ', breakdown.paypal_fee);
+      console.log('gross_amount: ', breakdown.gross_amount);
+      console.log('net_amount: ', breakdown.net_amount);
+
+      this.payGateway.notifyAll({
+        paid: true,
+        breakdown: {
+          fee: {
+            value: breakdown.paypal_fee.value,
+            currencyCode: breakdown.paypal_fee.currency_code,
+          },
+          gross: {
+            value: breakdown.gross_amount.value,
+            currencyCode: breakdown.gross_amount.currency_code,
+          },
+          net: {
+            value: breakdown.net_amount.value,
+            currencyCode: breakdown.net_amount.currency_code,
+          },
+        },
+      });
     }
 
     console.log('handlePaypalIPN Service');

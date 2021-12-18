@@ -8,7 +8,6 @@ import { UserModule } from './user/user.module';
 import { PayModule } from './pay/pay.module';
 
 let envFilePath = '.env.development';
-console.log(`Running in ${process.env.ENVIRONMENT || 'DEV'}`);
 
 if (process.env.ENVIRONMENT === 'PRODUCTION') {
   envFilePath = '.env';
