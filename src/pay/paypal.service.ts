@@ -80,7 +80,10 @@ export class PayPalService {
    * @param price Price of order.
    * @returns URL to checkout that customer should use to complete the order.
    */
-  public async createOrder(price: number): Promise<{ url: string }> {
+  public async createOrder(
+    ticketId: string,
+    price: number,
+  ): Promise<{ url: string }> {
     if (isNaN(price)) {
       throw new HttpException(
         {
