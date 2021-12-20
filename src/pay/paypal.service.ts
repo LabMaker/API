@@ -1,7 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import * as paypal from '@paypal/checkout-server-sdk';
+import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
+import { Ticket, TicketDocument } from '../schemas/TicketSchema';
 import { PayGateway } from './pay.gateway';
 
 @Injectable()
@@ -12,6 +15,7 @@ export class PayPalService {
   constructor(
     private readonly payGateway: PayGateway,
     private httpService: HttpService,
+    @InjectModel(Ticket.name) private ticketModel: Model<TicketDocument>,
   ) {}
 
   private get credentials() {
@@ -94,12 +98,27 @@ export class PayPalService {
       );
     }
 
+    // Make sure ticket exists in db
+    const ticket = await this.ticketModel.findOne({ ticketId: ticketId });
+    if (!ticket) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Ticket does not exist!',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     let request = new paypal.orders.OrdersCreateRequest();
     request.prefer('return=representation');
     request.requestBody({
       intent: 'CAPTURE',
       purchase_units: [
         {
+          // Using reference id so we can refer back to ticket later.
+          // So we don't need an extra db read to find ticket from tx id.
+          // reference_id: ticketId,
           amount: {
             currency_code: 'USD',
             value: price,
@@ -118,8 +137,23 @@ export class PayPalService {
 
     let response = await this.client.execute(request);
     let order = response.result;
-    let checkoutLink = order.links.find((e) => e.rel == 'approve').href;
 
+    // Add order id to ticket.
+    // TODO: After postgres migration, orders should be added to their own table linking back to
+    // the ticket incase we have multiple orders per ticket.
+    await this.ticketModel.findByIdAndUpdate(
+      ticket._id,
+      {
+        transactionId: order.id,
+      },
+      {
+        // required in versions below 6
+        useFindAndModify: false,
+      },
+    );
+
+    // Return checkout link if it exists
+    let checkoutLink = order.links.find((e) => e.rel == 'approve').href;
     if (checkoutLink) {
       return { url: checkoutLink };
     } else {
@@ -196,28 +230,47 @@ export class PayPalService {
         let oinfo = data.resource;
         let breakdown = oinfo.seller_receivable_breakdown;
 
+        const netStr = `${breakdown.net_amount.value}${breakdown.net_amount.currency_code}`;
+        const feeStr = `${breakdown.paypal_fee.value}${breakdown.paypal_fee.currency_code}`;
+
         Logger.log(
-          `Captured A Payment. Net: ${breakdown.net_amount}, Paypal Fee: ${breakdown.paypal_fee}`,
+          `Captured A Payment. Net: ${netStr}, Paypal Fee: ${feeStr}`,
           this.context,
         );
 
-        this.payGateway.notifyAll({
-          paid: true,
-          breakdown: {
-            fee: {
-              value: breakdown.paypal_fee.value,
-              currencyCode: breakdown.paypal_fee.currency_code,
-            },
-            gross: {
-              value: breakdown.gross_amount.value,
-              currencyCode: breakdown.gross_amount.currency_code,
-            },
-            net: {
-              value: breakdown.net_amount.value,
-              currencyCode: breakdown.net_amount.currency_code,
-            },
-          },
+        // doesn't give us the purchase_units, only the tx id, so use that to get ticket again in db
+        // for now, dont create new table for orders, do it after dan finishes change to postgres+prisma
+        const ticket = await this.ticketModel.findOne({
+          transactionId: oinfo.supplementary_data.related_ids.order_id,
         });
+
+        if (ticket) {
+          this.payGateway.notifyAll({
+            ticketId: ticket.ticketId,
+            paid: true,
+            breakdown: {
+              fee: {
+                value: breakdown.paypal_fee.value,
+                currencyCode: breakdown.paypal_fee.currency_code,
+              },
+              gross: {
+                value: breakdown.gross_amount.value,
+                currencyCode: breakdown.gross_amount.currency_code,
+              },
+              net: {
+                value: breakdown.net_amount.value,
+                currencyCode: breakdown.net_amount.currency_code,
+              },
+            },
+          });
+        } else {
+          Logger.error(
+            `Payment Capture Completed, but couldn't find relating ticket! ${JSON.stringify(
+              oinfo,
+            )}`,
+            this.context,
+          );
+        }
       }
     }
   }

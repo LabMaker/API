@@ -33,6 +33,13 @@ export class Ticket {
 
   @Prop({ default: false })
   submitted: boolean;
+
+  // For now we only support paypal, so this is unneccessarrryryyr
+  // @Prop()
+  // paymentMethod: string;
+
+  @Prop()
+  transactionId: string;
 }
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);
