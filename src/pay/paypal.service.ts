@@ -1,65 +1,81 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotImplementedException,
-} from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import * as paypal from '@paypal/checkout-server-sdk';
+import { firstValueFrom } from 'rxjs';
 import { PayGateway } from './pay.gateway';
 
 @Injectable()
 export class PayPalService {
+  private context = 'PayPal Service'; // For logger
   private client = new paypal.core.PayPalHttpClient(this.environment());
 
-  constructor(private readonly payGateway: PayGateway) {}
+  constructor(
+    private readonly payGateway: PayGateway,
+    private httpService: HttpService,
+  ) {}
 
   private get credentials() {
-    if (process.env.ENVIRONMENT === 'PRODUCTION') {
-      if (!process.env.PAYPAL_LIVE_CID || !process.env.PAYPAL_LIVE_CSECRET) {
-        throw new HttpException(
-          {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: 'PayPal app credentials were not defined.',
-          },
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+    let creds: { clientID: string; clientSecret: string };
 
-      return {
+    // Set credentials depending on env
+    if (process.env.ENVIRONMENT === 'PRODUCTION') {
+      creds = {
         clientID: process.env.PAYPAL_LIVE_CID,
         clientSecret: process.env.PAYPAL_LIVE_CSECRET,
       };
     } else {
-      if (!process.env.PAYPAL_SBX_CID || !process.env.PAYPAL_SBX_CSECRET) {
-        throw new HttpException(
-          {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: 'PayPal app credentials were not defined.',
-          },
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      return {
+      creds = {
         clientID: process.env.PAYPAL_SBX_CID,
         clientSecret: process.env.PAYPAL_SBX_CSECRET,
       };
     }
+
+    // If client id or secret are not present, return an error
+    if (!creds || !creds.clientID || !creds.clientSecret) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'PayPal app credentials are not defined.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    // Return creds if no error was thrown above
+    return creds;
+  }
+
+  private get webhookID(): string {
+    const whid =
+      process.env.ENVIRONMENT === 'PRODUCTION'
+        ? process.env.PAYPAL_LIVE_WHID
+        : process.env.PAYPAL_SBX_WHID;
+
+    if (!whid) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'PayPal WHID is not defined.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return whid;
   }
 
   private environment() {
     const { clientID, clientSecret } = this.credentials;
 
     if (process.env.ENVIRONMENT === 'PRODUCTION') {
-      throw new NotImplementedException();
-      // return new paypal.core.LiveEnvironment(clientID, clientSecret);
+      return new paypal.core.LiveEnvironment(clientID, clientSecret);
     }
 
     // If didnt return above, use Sandbox environment
     return new paypal.core.SandboxEnvironment(clientID, clientSecret);
   }
 
-  async createOrder(price: number): Promise<{ url: string }> {
+  public async createOrder(price: number): Promise<{ url: string }> {
     if (isNaN(price)) {
       throw new HttpException(
         {
@@ -94,18 +110,17 @@ export class PayPalService {
 
     let response = await this.client.execute(request);
     let order = response.result;
-
-    // If call returns body in response, you can get the deserialized version from the result attribute of the response.
-    console.log(`Order: ${JSON.stringify(order)}`);
-
     let checkoutLink = order.links.find((e) => e.rel == 'approve').href;
 
     if (checkoutLink) {
-      console.log('Checkout Link: ', checkoutLink);
-
       return { url: checkoutLink };
     } else {
-      console.error('Links: ', JSON.stringify(order.links));
+      Logger.warn(
+        `Couldn't find checkout link amongst these links: ${JSON.stringify(
+          order.links,
+        )}`,
+        this.context,
+      );
 
       throw new HttpException(
         {
@@ -124,57 +139,166 @@ export class PayPalService {
     // Call API with your client and get a response for your call
     let response = await this.client.execute(request);
 
-    console.log(`Response: ${JSON.stringify(response)}`);
-    // If call returns body in response, you can get the deserialized version from the result attribute of the response.
-    console.log(`Capture: ${JSON.stringify(response.result)}`);
+    Logger.log(
+      `Capturing Order: ${JSON.stringify(response.result)}`,
+      this.context,
+    );
   }
 
-  handleIPN(ev: any) {
-    // Order approved by customer, now capture payment
-    if (ev.event_type == 'CHECKOUT.ORDER.APPROVED') {
-      let oinfo = ev.resource;
+  public async handleWH(ev: any, headers: object) {
+    // Verify WH before accepting it as valid and using data in it.
+    const isValid = await this.verifyWH(headers, ev);
 
-      this.captureOrder(oinfo.id);
+    if (isValid) {
+      // Order approved by customer, now capture payment
+      if (ev.event_type == 'CHECKOUT.ORDER.APPROVED') {
+        let oinfo = ev.resource;
+
+        this.captureOrder(oinfo.id);
+
+        Logger.log(
+          `Checkout completed, attempting to capture funds..`,
+          this.context,
+        );
+      }
+
+      // Checkout completed, but funds are still processing!
+      if (ev.event_type == 'CHECKOUT.ORDER.COMPLETED') {
+        let oinfo = ev.resource;
+        let amount = oinfo.gross_amount;
+
+        Logger.log(
+          `Payment of ${amount.value} ${amount.currency_code} is **processing**.`,
+          this.context,
+        );
+      }
+
+      // Funds have been captured from the payee, payment process fully completed
+      if (ev.event_type == 'PAYMENT.CAPTURE.COMPLETED') {
+        let oinfo = ev.resource;
+        let breakdown = oinfo.seller_receivable_breakdown;
+
+        Logger.log(
+          `Captured A Payment. Net: ${breakdown.net_amount}, Paypal Fee: ${breakdown.paypal_fee}`,
+          this.context,
+        );
+
+        this.payGateway.notifyAll({
+          paid: true,
+          breakdown: {
+            fee: {
+              value: breakdown.paypal_fee.value,
+              currencyCode: breakdown.paypal_fee.currency_code,
+            },
+            gross: {
+              value: breakdown.gross_amount.value,
+              currencyCode: breakdown.gross_amount.currency_code,
+            },
+            net: {
+              value: breakdown.net_amount.value,
+              currencyCode: breakdown.net_amount.currency_code,
+            },
+          },
+        });
+      }
     }
+  }
 
-    // Checkout completed, but funds are still processing!
-    if (ev.event_type == 'CHECKOUT.ORDER.COMPLETED') {
-      let oinfo = ev.resource;
-      let amount = oinfo.gross_amount;
+  public async verifyWH(headers: object, data: any) {
+    const verifyEndPoint =
+      process.env.ENVIRONMENT === 'PRODUCTION'
+        ? 'https://api-m.paypal.com/v1/notifications/verify-webhook-signature'
+        : 'https://api-m.sandbox.paypal.com/v1/notifications/verify-webhook-signature';
 
-      console.log(
-        `Payment of ${amount.value} ${amount.currency_code} is **processing**.`,
+    // base64 encode our credentials to form our token to send to paypal
+    const cred = this.credentials;
+    const authTkn = Buffer.from(
+      `${cred.clientID}:${cred.clientSecret}`,
+    ).toString('base64');
+
+    try {
+      // Send webhook details to paypal so they can verify it for us
+      const resp = await firstValueFrom(
+        this.httpService.post(
+          `${verifyEndPoint}`,
+          {
+            auth_algo: headers['paypal-auth-algo'],
+            cert_url: headers['paypal-cert-url'],
+            transmission_id: headers['paypal-transmission-id'],
+            transmission_sig: headers['paypal-transmission-sig'],
+            transmission_time: headers['paypal-transmission-time'],
+            webhook_id: this.webhookID,
+            webhook_event: data,
+          },
+          {
+            timeout: 10000,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Basic ${authTkn}`,
+              'User-Agent': 'LabMaker-PIPN-Verifier/0.1',
+            },
+          },
+        ),
       );
+
+      if (resp.data.verification_status == 'SUCCESS') {
+        return true;
+      }
+    } catch (err) {
+      const resp = err.response;
+      const data = resp.data;
+
+      let msg = `Error verifying webhook: ${resp.status} ${resp.statusText} => `;
+
+      if (data.error && data.error_description)
+        msg += `${data.error}: ${data.error_description}`;
+      // Just pass through whole json body if error doesn't conform to fields in if above, so atleast we have everything we need to handle an error
+      else msg += JSON.stringify(data);
+
+      Logger.error(msg, this.context);
+      return false;
     }
 
-    // Funds have been captured from the payee, payment process fully completed
-    if (ev.event_type == 'PAYMENT.CAPTURE.COMPLETED') {
-      let oinfo = ev.resource;
-      let breakdown = oinfo.seller_receivable_breakdown;
-
-      console.log('paypal_fee: ', breakdown.paypal_fee);
-      console.log('gross_amount: ', breakdown.gross_amount);
-      console.log('net_amount: ', breakdown.net_amount);
-
-      this.payGateway.notifyAll({
-        paid: true,
-        breakdown: {
-          fee: {
-            value: breakdown.paypal_fee.value,
-            currencyCode: breakdown.paypal_fee.currency_code,
-          },
-          gross: {
-            value: breakdown.gross_amount.value,
-            currencyCode: breakdown.gross_amount.currency_code,
-          },
-          net: {
-            value: breakdown.net_amount.value,
-            currencyCode: breakdown.net_amount.currency_code,
-          },
-        },
-      });
-    }
-
-    console.log('handlePaypalIPN Service');
+    // If true isn't returned above, then we must have failed somewhere
+    Logger.warn('Invalid webhook recieved', this.context);
+    return false;
   }
+
+  // /**
+  //  * Sends IPN back to paypal so they can verify it for us.
+  //  * @param ipn IPN to verify.
+  //  * @returns True/False depending on response from paypal.
+  //  */
+  // private async verifyIPN(ipn: string): Promise<boolean> {
+  //   // Set verify endpoint to sandbox/prod depending on environment
+  //   const verifyEndPoint =
+  //     process.env.ENVIRONMENT === 'PRODUCTION'
+  //       ? 'https://ipnpb.paypal.com/cgi-bin/webscr'
+  //       : 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
+  //
+  //   // Send IPN back to paypal for them to verify it.
+  //   // Prefix cmd=_notify-validate param to url so paypal knows we want to verify IPN.
+  //   const resp = await firstValueFrom(
+  //     this.httpService.post(
+  //       `${verifyEndPoint}?cmd=_notify-validate&${ipn.toString()}`,
+  //       undefined,
+  //       {
+  //         timeout: 10000,
+  //         headers: {
+  //           'User-Agent': 'LabMaker-PIPN-Verifier/0.1',
+  //         },
+  //       },
+  //     ),
+  //   );
+
+  //   // If response if 'VERIFIED' then paypal approves
+  //   if (resp.data === 'VERIFIED') {
+  //     Logger.log('VALID IPN recieved!', this.context);
+  //     return true;
+  //   }
+
+  //   // IPN Is Invalid! Oh NNOOO!!!
+  //   Logger.warn('Invalid IPN recieved!', this.context);
+  //   return false;
+  // }
 }
