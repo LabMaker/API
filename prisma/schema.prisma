@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String
+  discriminator String
+  avatar String
+  accessToken String
+  refreshToken String
+  tokenVersion String
+  nodes ReddditConfig[]
+}
+
+model ReddditConfig {
+  id Int @id @default(autoincrement())
+  clientId String
+  clientSecret String
+  username String
+  password String
+  userAgent String
+  title String
+  pmBody String
+  subreddits String[]
+  forbiddenWords String[]
+  blockedUsers String[]
+  userId Int
+  creator User @relation(fields: [userId], references: [id])
+  logs Logs[]
+}
+
+//Commented Out Relations as Payment Configs can be used across Multiple
+//Discord Configs
+model DiscordConfig {
+  id String @id
+  name String
+  icon String
+  prefix String @default("?")
+  embedImageUrl String @default("https://i.imgur.com/rDzblHE.gif")
+  autoSwicher Boolean @default(false)
+  autoTicket Boolean @default(false)
+  autoReact Boolean @default(false)
+  // payment Payment[]
+  paymentConfigId String
+  tickets Ticket[]
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+  name String
+  value String
+  type String
+  // discordConfig DiscordConfig @relation(fields: [serverId], references: [id])
+  serverId String
+}
+
+model Ticket {
+  id Int @id @default(autoincrement())
+  ticketId Int
+  serverId String
+  channelId String
+  type String
+  subject String
+  time String
+  level String
+  budget String
+  submitted Boolean
+  discordConfig DiscordConfig @relation(fields: [serverId], references: [id])
+}
+
+model Logs {
+  id Int @id @default(autoincrement())
+  nodeId Int
+  message String
+  subId String
+  username String
+  subreddit String
+  pm Boolean
+  redditConfig ReddditConfig @relation(fields: [nodeId], references: [id])
+}
