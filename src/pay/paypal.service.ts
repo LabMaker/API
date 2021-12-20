@@ -75,6 +75,11 @@ export class PayPalService {
     return new paypal.core.SandboxEnvironment(clientID, clientSecret);
   }
 
+  /**
+   * Create a new order.
+   * @param price Price of order.
+   * @returns URL to checkout that customer should use to complete the order.
+   */
   public async createOrder(price: number): Promise<{ url: string }> {
     if (isNaN(price)) {
       throw new HttpException(
@@ -132,6 +137,10 @@ export class PayPalService {
     }
   }
 
+  /**
+   * Capture order after the customer has approved it.
+   * @param orderId ID to order that we need to capture.
+   */
   private async captureOrder(orderId: string) {
     let request = new paypal.orders.OrdersCaptureRequest(orderId);
     request.requestBody({});
@@ -145,14 +154,20 @@ export class PayPalService {
     );
   }
 
-  public async handleWH(ev: any, headers: object) {
+  /**
+   * Handle webhook events.
+   * Checks if it is valid before using.
+   * @param data Webhook data.
+   * @param headers Webhook request headers.
+   */
+  public async handleWH(data: any, headers: object) {
     // Verify WH before accepting it as valid and using data in it.
-    const isValid = await this.verifyWH(headers, ev);
+    const isValid = await this.verifyWH(headers, data);
 
     if (isValid) {
       // Order approved by customer, now capture payment
-      if (ev.event_type == 'CHECKOUT.ORDER.APPROVED') {
-        let oinfo = ev.resource;
+      if (data.event_type == 'CHECKOUT.ORDER.APPROVED') {
+        let oinfo = data.resource;
 
         this.captureOrder(oinfo.id);
 
@@ -163,8 +178,8 @@ export class PayPalService {
       }
 
       // Checkout completed, but funds are still processing!
-      if (ev.event_type == 'CHECKOUT.ORDER.COMPLETED') {
-        let oinfo = ev.resource;
+      if (data.event_type == 'CHECKOUT.ORDER.COMPLETED') {
+        let oinfo = data.resource;
         let amount = oinfo.gross_amount;
 
         Logger.log(
@@ -174,8 +189,8 @@ export class PayPalService {
       }
 
       // Funds have been captured from the payee, payment process fully completed
-      if (ev.event_type == 'PAYMENT.CAPTURE.COMPLETED') {
-        let oinfo = ev.resource;
+      if (data.event_type == 'PAYMENT.CAPTURE.COMPLETED') {
+        let oinfo = data.resource;
         let breakdown = oinfo.seller_receivable_breakdown;
 
         Logger.log(
@@ -204,6 +219,12 @@ export class PayPalService {
     }
   }
 
+  /**
+   * Verify the webhooks integrity - that is was actually sent by paypal.
+   * @param headers Webhooks request headers.
+   * @param data Webhook data
+   * @returns True/False depending on if it is valid or not.
+   */
   public async verifyWH(headers: object, data: any) {
     const verifyEndPoint =
       process.env.ENVIRONMENT === 'PRODUCTION'
@@ -263,42 +284,4 @@ export class PayPalService {
     Logger.warn('Invalid webhook recieved', this.context);
     return false;
   }
-
-  // /**
-  //  * Sends IPN back to paypal so they can verify it for us.
-  //  * @param ipn IPN to verify.
-  //  * @returns True/False depending on response from paypal.
-  //  */
-  // private async verifyIPN(ipn: string): Promise<boolean> {
-  //   // Set verify endpoint to sandbox/prod depending on environment
-  //   const verifyEndPoint =
-  //     process.env.ENVIRONMENT === 'PRODUCTION'
-  //       ? 'https://ipnpb.paypal.com/cgi-bin/webscr'
-  //       : 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
-  //
-  //   // Send IPN back to paypal for them to verify it.
-  //   // Prefix cmd=_notify-validate param to url so paypal knows we want to verify IPN.
-  //   const resp = await firstValueFrom(
-  //     this.httpService.post(
-  //       `${verifyEndPoint}?cmd=_notify-validate&${ipn.toString()}`,
-  //       undefined,
-  //       {
-  //         timeout: 10000,
-  //         headers: {
-  //           'User-Agent': 'LabMaker-PIPN-Verifier/0.1',
-  //         },
-  //       },
-  //     ),
-  //   );
-
-  //   // If response if 'VERIFIED' then paypal approves
-  //   if (resp.data === 'VERIFIED') {
-  //     Logger.log('VALID IPN recieved!', this.context);
-  //     return true;
-  //   }
-
-  //   // IPN Is Invalid! Oh NNOOO!!!
-  //   Logger.warn('Invalid IPN recieved!', this.context);
-  //   return false;
-  // }
 }
