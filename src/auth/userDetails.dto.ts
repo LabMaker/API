@@ -2,6 +2,7 @@ import { User } from '../schemas/UserSchema';
 
 export type UserDetails = {
   _id: string;
+  id: string;
   username: string;
   discriminator: string;
   avatar: string;

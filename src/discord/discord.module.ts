@@ -16,6 +16,7 @@ import { HttpModule } from '@nestjs/axios';
 import { UserModule } from '../user/user.module';
 import { GuildsController } from './controllers/guilds.controller';
 import { GuildsService } from './services/guilds.service';
+import { PrismaService } from '../prisma.service';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { GuildsService } from './services/guilds.service';
       provide: 'GUILD_SERVICE',
       useClass: GuildsService,
     },
+    PrismaService,
   ],
 })
 export class DiscordModule {}

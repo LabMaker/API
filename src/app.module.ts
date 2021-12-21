@@ -25,5 +25,6 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
   ],
   controllers: [],
   providers: [PrismaService],
+  // exports: [PrismaService]
 })
 export class AppModule {}

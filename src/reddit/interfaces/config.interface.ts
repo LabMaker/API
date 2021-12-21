@@ -1,17 +1,15 @@
+import { RedditConfig } from '.prisma/client';
 import { UserDetails } from '../../auth/userDetails.dto';
-import { RedditConfig } from '../../schemas/RedditConfigSchema';
+// import { RedditConfig } from '../../schemas/RedditConfigSchema';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
 
 export interface IRedditConfig {
-  getConfig(id: string): Promise<RedditConfig>;
+  getConfig(id: number): Promise<RedditConfig>;
   getConfigs(user: UserDetails): Promise<RedditConfig[]>;
-  createConfig(
-    guildConfigDto: CreateConfigDto,
-    user: UserDetails,
-  ): Promise<RedditConfig>;
+  createConfig(guildConfigDto: CreateConfigDto): Promise<RedditConfig>;
   updateConfig(
     updateConfigDto: CreateConfigDto,
   ): Promise<RedditConfig> | Promise<null>;
-  updateMessage(id: string, message: string): Promise<any>;
-  deleteConfig(id: string, user: UserDetails): Promise<any>;
+  updateMessage(id: number, message: string): Promise<any>;
+  deleteConfig(id: number): Promise<any>;
 }

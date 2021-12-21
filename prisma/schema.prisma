@@ -11,17 +11,17 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id String @id
   username String
   discriminator String
   avatar String
   accessToken String
   refreshToken String
-  tokenVersion String
-  nodes ReddditConfig[]
+  tokenVersion Int @default(0)
+  nodes RedditConfig[]
 }
 
-model ReddditConfig {
+model RedditConfig {
   id Int @id @default(autoincrement())
   clientId String
   clientSecret String
@@ -33,9 +33,9 @@ model ReddditConfig {
   subreddits String[]
   forbiddenWords String[]
   blockedUsers String[]
-  userId Int
+  userId String
   creator User @relation(fields: [userId], references: [id])
-  logs Logs[]
+  logs Log[]
 }
 
 //Commented Out Relations as Payment Configs can be used across Multiple
@@ -77,7 +77,7 @@ model Ticket {
   discordConfig DiscordConfig @relation(fields: [serverId], references: [id])
 }
 
-model Logs {
+model Log {
   id Int @id @default(autoincrement())
   nodeId Int
   message String
@@ -85,5 +85,5 @@ model Logs {
   username String
   subreddit String
   pm Boolean
-  redditConfig ReddditConfig @relation(fields: [nodeId], references: [id])
+  redditConfig RedditConfig @relation(fields: [nodeId], references: [id])
 }

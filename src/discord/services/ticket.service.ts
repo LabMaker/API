@@ -5,10 +5,12 @@ import { Ticket, TicketDocument } from '../../schemas/TicketSchema';
 import { CreateTicketDto } from '../dtos/create-ticket.dto';
 import { ITicketService } from '../interfaces/ticket.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class TicketService implements ITicketService {
   constructor(
+    private prismaService: PrismaService,
     @InjectModel(Ticket.name)
     private ticketRepository: Model<TicketDocument>,
   ) {}
