@@ -1,6 +1,5 @@
 import { RedditConfig } from '.prisma/client';
 import { UserDetails } from '../../auth/userDetails.dto';
-// import { RedditConfig } from '../../schemas/RedditConfigSchema';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
 
 export interface IRedditConfig {

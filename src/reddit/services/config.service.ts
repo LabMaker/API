@@ -1,12 +1,7 @@
 import { RedditConfig } from '.prisma/client';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { PrismaService } from '../../prisma.service';
-import { RedditConfigDocument } from '../../schemas/RedditConfigSchema';
-import { User, UserDocument } from '../../schemas/UserSchema';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
