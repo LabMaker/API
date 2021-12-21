@@ -1,8 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { User } from '@prisma/client';
-import { Model } from 'mongoose';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';
 import { PrismaService } from '../prisma.service';

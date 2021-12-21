@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { DiscordModule } from './discord/discord.module';
 import { RedditModule } from './reddit/reddit.module';
 import { AuthModule } from './auth/auth.module';
