@@ -1,11 +1,11 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { User } from '@prisma/client';
 import { Model } from 'mongoose';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';
 import { PrismaService } from '../prisma.service';
-import { User, UserDocument } from '../schemas/UserSchema';
 import { UserDto } from './dto/User.dto';
 
 @Injectable()
@@ -13,12 +13,11 @@ export class UserService {
   constructor(
     private prismaService: PrismaService,
     @Inject(HttpService) private readonly httpService: HttpService,
-    @InjectModel(User.name) private userRepo: Model<UserDocument>,
   ) {}
 
   async getUser(userDetails: UserDetails): Promise<UserDto> {
     const user = await this.prismaService.user.findUnique({
-      where: { id: userDetails._id },
+      where: { id: userDetails.id },
       include: { nodes: true },
     });
 
@@ -30,23 +29,30 @@ export class UserService {
         },
       },
     );
+
     const discordUser = await (await lastValueFrom(fetchedUser)).data;
-    await this.userRepo.findOneAndUpdate({ _id: discordUser.id }, discordUser, {
-      useFindAndModify: false,
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: discordUser.id },
+      data: {
+        username: discordUser.username,
+        discriminator: discordUser.discriminator,
+        avatar: discordUser.avatar,
+        accessToken: discordUser.accessToken,
+        refreshToken: discordUser.refreshToken,
+      },
     });
 
     return {
-      _id: user.id,
-      username: user.username,
-      discriminator: user.discriminator,
-      avatar: user.avatar,
+      id: updatedUser.id,
+      username: updatedUser.username,
+      discriminator: updatedUser.discriminator,
+      avatar: updatedUser.avatar,
       nodes: user.nodes,
     };
   }
 
   async getUserDetails(id: string): Promise<User> {
-    const user = await this.userRepo.findById(id);
-
-    return user;
+    return await this.prismaService.user.findUnique({ where: { id } });
   }
 }

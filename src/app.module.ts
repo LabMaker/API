@@ -17,7 +17,6 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
     DiscordModule,
     RedditModule,
     AuthModule,

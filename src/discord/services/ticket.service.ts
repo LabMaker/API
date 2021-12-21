@@ -1,54 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Ticket, TicketDocument } from '../../schemas/TicketSchema';
 import { CreateTicketDto } from '../dtos/create-ticket.dto';
 import { ITicketService } from '../interfaces/ticket.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../prisma.service';
+import { Ticket } from '@prisma/client';
 
 @Injectable()
 export class TicketService implements ITicketService {
-  constructor(
-    private prismaService: PrismaService,
-    @InjectModel(Ticket.name)
-    private ticketRepository: Model<TicketDocument>,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   async getTicket(serverId: string, ticketId: string): Promise<Ticket> {
-    return await this.ticketRepository.findOne({
-      serverId,
-      ticketId,
+    //Update Database to make ServerId + TicketID + Channel ID Unique Combination
+    return await this.prismaService.ticket.findFirst({
+      where: { serverId, ticketId },
     });
   }
 
   async getTickets(serverId: string): Promise<Ticket[]> {
-    return await this.ticketRepository.find({
-      serverId,
-    });
+    return await this.prismaService.ticket.findMany({ where: { serverId } });
   }
 
   async createTicket(newTicketDto: CreateTicketDto): Promise<Ticket> {
-    newTicketDto._id = uuidv4();
-    console.log('creating');
-    const createdTicket = new this.ticketRepository(newTicketDto);
-    return await createdTicket.save();
+    return await this.prismaService.ticket.create({ data: newTicketDto });
   }
 
   async updateConfig(updateTicketDto: CreateTicketDto): Promise<any> {
-    const filter = { _id: updateTicketDto._id };
-
-    return await this.ticketRepository.findOneAndUpdate(
-      filter,
-      { ...updateTicketDto },
-      {
-        new: true,
-        useFindAndModify: false,
-      },
-    );
+    return await this.prismaService.ticket.update({
+      where: { id: updateTicketDto.id },
+      data: updateTicketDto,
+    });
   }
 
-  async deleteTicket(_id: string) {
-    return await this.ticketRepository.deleteOne({ _id });
+  async deleteTicket(id: number) {
+    return await this.prismaService.ticket.delete({ where: { id } });
   }
 }

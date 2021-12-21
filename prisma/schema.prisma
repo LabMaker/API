@@ -63,17 +63,19 @@ model Payment {
   serverId String
 }
 
+//Update Client side to not Post ticket until
+//It is Finished.
 model Ticket {
   id Int @id @default(autoincrement())
-  ticketId Int
+  ticketId String //Ticket ID is the ID of the Channel Name not database ID
   serverId String
   channelId String
-  type String
-  subject String
-  time String
-  level String
-  budget String
-  submitted Boolean
+  type String @default("")
+  subject String @default("")
+  time String @default("")
+  level String @default("")
+  budget String @default("")
+  submitted Boolean @default(false)
   discordConfig DiscordConfig @relation(fields: [serverId], references: [id])
 }
 

@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Payment } from '../../schemas/PaymentSchema';
+import { Payment } from '@prisma/client';
 import { CreatePaymentDto } from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 

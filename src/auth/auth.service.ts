@@ -12,21 +12,6 @@ export class AuthService {
   ) {}
 
   private context = 'Auth';
-  // async validateUser(details: UserDetails) {
-  //   const { _id } = details;
-  //   let user = await this.userRepo.findById(_id);
-
-  //   if (user) {
-  //     await this.userRepo.findByIdAndUpdate(_id, details, {
-  //       new: true,
-  //       useFindAndModify: false,
-  //     });
-  //   } else {
-  //     user = await this.createUser(details);
-  //   }
-  //   const refreshToken = this.createRefreshToken(user, 'user');
-  //   return refreshToken;
-  // }
 
   async validateUser(details: UserDetails) {
     const { id } = details;

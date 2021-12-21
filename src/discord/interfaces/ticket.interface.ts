@@ -1,4 +1,4 @@
-import { Ticket } from '../../schemas/TicketSchema';
+import { Ticket } from '@prisma/client';
 import { CreateTicketDto } from '../dtos/create-ticket.dto';
 
 export interface ITicketService {
@@ -8,5 +8,5 @@ export interface ITicketService {
   updateConfig(
     updateTicketDto: CreateTicketDto,
   ): Promise<Ticket> | Promise<null>;
-  deleteTicket(id: string);
+  deleteTicket(id: number);
 }

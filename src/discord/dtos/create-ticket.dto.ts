@@ -1,9 +1,9 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTicketDto {
   @IsOptional()
-  @IsString()
-  _id: string;
+  @IsNumber()
+  id: number;
 
   @IsString()
   ticketId: string;

@@ -1,62 +1,44 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Payment, PaymentDocument } from '../../schemas/PaymentSchema';
+import { Injectable } from '@nestjs/common';
 import { CreatePaymentDto } from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../../prisma.service';
+import { Payment } from '@prisma/client';
 
 @Injectable()
 export class PaymentService implements IPaymentService {
-  constructor(
-    @InjectModel(Payment.name)
-    private paymentRepository: Model<PaymentDocument>,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   async getPayments(serverId: string): Promise<Payment[]> {
-    const filter = { serverId };
-
-    return await this.paymentRepository.find(filter);
+    return await this.prismaService.payment.findMany({ where: { serverId } });
   }
 
   async createPayments(payments: CreatePaymentDto[]): Promise<Payment[] | any> {
-    const map = await Promise.all(
-      payments.map(async (payment) => {
-        payment._id = uuidv4();
-
-        const newPayment = new this.paymentRepository(payment);
-        await newPayment.save();
-
-        return payment;
-      }),
-    );
-
-    return map;
+    return await this.prismaService.payment.createMany({
+      data: payments,
+    });
   }
 
   async updatPayments(
     updatedPayments: CreatePaymentDto[],
   ): Promise<Payment[] | any> {
-    const map = await Promise.all(
+    const savedPayments = [];
+    await Promise.all(
       updatedPayments.map(async (payment) => {
-        const filter = { _id: payment._id };
-        const updatedPayment = await this.paymentRepository.findOneAndUpdate(
-          filter,
-          payment,
-          {
-            new: true,
-            useFindAndModify: false,
-          },
-        );
-
-        return updatedPayment;
+        const updatedPayment = await this.prismaService.payment.update({
+          where: { id: payment.id },
+          data: payment,
+        });
+        savedPayments.push(updatedPayment);
       }),
     );
 
-    return map;
+    return savedPayments;
   }
 
-  async deletePayments(deleteIds: string[]) {
-    await this.paymentRepository.deleteMany({ _id: { $in: deleteIds } });
+  async deletePayments(deleteIds: number[]) {
+    deleteIds.forEach(
+      async (id) => await this.prismaService.payment.delete({ where: { id } }),
+    );
   }
 }

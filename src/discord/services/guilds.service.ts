@@ -1,32 +1,22 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../../auth/userDetails.dto';
-import {
-  DiscordConfig,
-  DiscordConfigDocument,
-} from '../../schemas/DiscordConfigSchema';
 import { Guild } from '../dtos/Guild.dto';
 import { UserService } from '../../user/user.service';
 import { IGuild } from '../interfaces/guild.interface';
-import { Payment, PaymentDocument } from '../../schemas/PaymentSchema';
+import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class GuildsService implements IGuild {
   constructor(
+    private prismaService: PrismaService,
     private userService: UserService,
     @Inject(HttpService) private readonly httpService: HttpService,
-    @InjectModel(DiscordConfig.name)
-    private guildConfigRepository: Model<DiscordConfigDocument>,
-    @InjectModel(Payment.name)
-    private paymentRepository: Model<PaymentDocument>,
   ) {}
 
   async fetchGuilds(user: UserDetails): Promise<Guild[]> {
-    const userDetails = await this.userService.getUserDetails(user._id);
-    console.log(userDetails.accessToken);
+    const userDetails = await this.userService.getUserDetails(user.id);
 
     const fetchedGuilds = this.httpService.get(
       'https://discord.com/api/v9/users/@me/guilds',
@@ -52,19 +42,22 @@ export class GuildsService implements IGuild {
 
     await Promise.all(
       validGuilds.map(async (guild) => {
-        const storedGuild = await this.guildConfigRepository.findOne({
-          _id: guild.id,
+        const storedGuild = await this.prismaService.discordConfig.update({
+          where: { id: guild.id },
+          data: guild,
         });
 
         if (storedGuild) {
           guild.joined = true;
+
+          //Looks like its removing the item from the array but this could be
+          //Achieved in one line so im unsure why idid it this method
+          //Unless its doing something else.
           validGuilds.splice(validGuilds.indexOf(guild), 1);
           validGuilds.splice(spliceIndex, 0, guild);
-          const filter = { _id: guild.id };
 
-          await this.guildConfigRepository.findOneAndUpdate(filter, guild, {
-            useFindAndModify: false,
-          });
+          //Uncomment and see what this does once Branch is merged with master
+          // validGuilds.filter((lGuild) => lGuild.id !== guild.id);
           spliceIndex++;
         }
       }),
@@ -73,12 +66,15 @@ export class GuildsService implements IGuild {
     return validGuilds;
   }
 
+  //Grabs Guilds from Database instead of Discord API
   async getLocalData(serverId: string): Promise<any> {
-    const config = await this.guildConfigRepository.findOne({
-      _id: serverId,
+    const config = await this.prismaService.discordConfig.findUnique({
+      where: { id: serverId },
     });
 
-    const payments = await this.paymentRepository.find({ serverId });
+    const payments = await this.prismaService.payment.findMany({
+      where: { serverId: config.paymentConfigId },
+    });
 
     return {
       config,

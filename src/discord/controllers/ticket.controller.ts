@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Ticket } from '../../schemas/TicketSchema';
+import { Ticket } from '@prisma/client';
 import { CreateTicketDto } from '../dtos/create-ticket.dto';
 import { ITicketService } from '../interfaces/ticket.interface';
 
@@ -42,7 +42,7 @@ export class TicketController {
   }
 
   @Delete('/:id')
-  deleteTicket(@Param('id') _id: string) {
-    return this.ticketService.deleteTicket(_id);
+  deleteTicket(@Param('id') id: number) {
+    return this.ticketService.deleteTicket(id);
   }
 }
