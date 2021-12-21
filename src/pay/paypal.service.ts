@@ -5,6 +5,7 @@ import * as paypal from '@paypal/checkout-server-sdk';
 import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
 import { Ticket, TicketDocument } from '../schemas/TicketSchema';
+import { PayGatewayOperation } from './dtos/PayGatewayMessage.dto';
 import { PayGateway } from './pay.gateway';
 
 @Injectable()
@@ -85,7 +86,7 @@ export class PayPalService {
    * @returns URL to checkout that customer should use to complete the order.
    */
   public async createOrder(
-    ticketId: string,
+    channelId: string,
     price: number,
   ): Promise<{ url: string }> {
     if (isNaN(price)) {
@@ -99,7 +100,7 @@ export class PayPalService {
     }
 
     // Make sure ticket exists in db
-    const ticket = await this.ticketModel.findOne({ ticketId: ticketId });
+    const ticket = await this.ticketModel.findOne({ channelId: channelId });
     if (!ticket) {
       throw new HttpException(
         {
@@ -118,7 +119,7 @@ export class PayPalService {
         {
           // Using reference id so we can refer back to ticket later.
           // So we don't need an extra db read to find ticket from tx id.
-          // reference_id: ticketId,
+          // reference_id: channelId,
           amount: {
             currency_code: 'USD',
             value: price,
@@ -246,20 +247,23 @@ export class PayPalService {
 
         if (ticket) {
           this.payGateway.notifyAll({
-            ticketId: ticket.ticketId,
-            paid: true,
-            breakdown: {
-              fee: {
-                value: breakdown.paypal_fee.value,
-                currencyCode: breakdown.paypal_fee.currency_code,
-              },
-              gross: {
-                value: breakdown.gross_amount.value,
-                currencyCode: breakdown.gross_amount.currency_code,
-              },
-              net: {
-                value: breakdown.net_amount.value,
-                currencyCode: breakdown.net_amount.currency_code,
+            op: PayGatewayOperation.PaymentCompleted,
+            data: {
+              channelId: ticket.channelId,
+              paid: true,
+              breakdown: {
+                fee: {
+                  value: breakdown.paypal_fee.value,
+                  currencyCode: breakdown.paypal_fee.currency_code,
+                },
+                gross: {
+                  value: breakdown.gross_amount.value,
+                  currencyCode: breakdown.gross_amount.currency_code,
+                },
+                net: {
+                  value: breakdown.net_amount.value,
+                  currencyCode: breakdown.net_amount.currency_code,
+                },
               },
             },
           });

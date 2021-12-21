@@ -4,12 +4,13 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'ws';
+import PayGatewayMessage from './dtos/PayGatewayMessage.dto';
 
 @WebSocketGateway()
 export class PayGateway {
   @WebSocketServer() server: Server;
 
-  public notifyAll(msg: object | string) {
+  public notifyAll(msg: PayGatewayMessage) {
     this.server.clients.forEach((client) => {
       client.send(JSON.stringify(msg));
     });
