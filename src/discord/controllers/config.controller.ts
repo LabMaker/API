@@ -8,11 +8,10 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { DiscordConfig } from '../../schemas/DiscordConfigSchema';
 import { IDiscordConfig } from '../interfaces/config.interface';
 import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
-import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
 import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
+import { DiscordConfig } from '@prisma/client';
 
 @Controller('discord/config')
 export class ConfigController {
@@ -39,7 +38,7 @@ export class ConfigController {
   }
 
   @Put()
-  updateConfig(@Body() body: UpdateConfigDto) {
+  updateConfig(@Body() body: CreateConfigDto) {
     return this.configService.updateConfig(body);
   }
 }

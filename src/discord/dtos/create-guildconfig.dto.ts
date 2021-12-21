@@ -2,10 +2,13 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateConfigDto {
   @IsString()
-  _id: string;
+  id: string;
 
   @IsString()
-  paymentConfigId: string;
+  name: string;
+
+  @IsString()
+  icon: string;
 
   @IsOptional()
   @IsString()
@@ -14,6 +17,9 @@ export class CreateConfigDto {
   @IsOptional()
   @IsString()
   embedImageUrl: string;
+
+  @IsString()
+  paymentConfigId: string;
 
   @IsOptional()
   @IsBoolean()

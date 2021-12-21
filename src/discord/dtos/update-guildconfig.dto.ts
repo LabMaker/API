@@ -2,7 +2,7 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateConfigDto {
   @IsString()
-  _id: string;
+  id: string;
 
   @IsString()
   paymentConfigId: string;
