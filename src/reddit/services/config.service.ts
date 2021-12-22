@@ -1,15 +1,41 @@
 import { RedditConfig } from '.prisma/client';
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { PrismaService } from '../../prisma.service';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
+import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
 @Injectable()
 export class ConfigService implements IRedditConfig {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    @Inject(HttpService) private readonly httpService: HttpService,
+  ) {}
 
   async getConfig(id: number): Promise<RedditConfig> {
+    //Send Back X Amount OF Logs
+    //Not Sure if You can filter Logs Like This in Relationships (Could Manually Query Logs Instead?)
+    // let configs =  await this.prismaService.redditConfig.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    //   include: {
+    //     _count: {
+    //       select: {
+    //         logs: true,
+    //       },
+    //     },
+    //   },
+    // });
+
     return await this.prismaService.redditConfig.findUnique({
       where: {
         id,
@@ -25,6 +51,7 @@ export class ConfigService implements IRedditConfig {
   }
 
   async createConfig(newConfig: CreateConfigDto): Promise<RedditConfig> {
+    Logger.log(JSON.stringify(newConfig), 'RedditConfig');
     try {
       return await this.prismaService.redditConfig.create({
         data: newConfig,
@@ -35,7 +62,7 @@ export class ConfigService implements IRedditConfig {
     }
   }
 
-  async updateConfig(updateConfigDto: CreateConfigDto): Promise<any> {
+  async updateConfig(updateConfigDto: UpdateConfigDto): Promise<any> {
     const filter = { id: updateConfigDto.id };
 
     return await this.prismaService.redditConfig.update({
@@ -54,5 +81,21 @@ export class ConfigService implements IRedditConfig {
   async deleteConfig(id: number): Promise<any> {
     await this.prismaService.redditConfig.delete({ where: { id } });
     return;
+  }
+
+  //Fix Function
+  async getProfile(username: string): Promise<any> {
+    const xPathValue = `//*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[2]/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[2]/img`;
+    // const htmlPage = this.httpService
+    // .get(`https://reddit.com/user/${username}`)
+    // .pipe(map((response) => response.data));
+
+    const data = this.httpService.get(`https://reddit.com/user/${username}`);
+    const htmlPage = await (await lastValueFrom(data)).data;
+
+    // Logger.log(data);
+
+    return htmlPage;
+    //*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[2]/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[2]/img
   }
 }

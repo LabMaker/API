@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Inject,
+  Logger,
   Param,
   Post,
   Put,
@@ -14,6 +15,7 @@ import { UserDetails } from '../../auth/userDetails.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
 import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
+import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
 @Controller('reddit/config')
@@ -42,7 +44,7 @@ export class ConfigController {
   }
 
   @Put()
-  updateConfig(@Body() body: CreateConfigDto) {
+  updateConfig(@Body() body: UpdateConfigDto) {
     return this.configService.updateConfig(body);
   }
 
@@ -55,5 +57,11 @@ export class ConfigController {
   @UseGuards(JwtAuthGuard)
   deleteConfig(@Param('id') id: number) {
     return this.configService.deleteConfig(id);
+  }
+
+  @Get('image/profile')
+  getProfile(): Promise<any> {
+    Logger.log('Running Image/Profile', 'Config Controller');
+    return this.configService.getProfile('chikybacon');
   }
 }

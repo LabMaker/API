@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';
@@ -14,6 +14,7 @@ export class UserService {
   ) {}
 
   async getUser(userDetails: UserDetails): Promise<UserDto> {
+    Logger.error(userDetails, 'User');
     const user = await this.prismaService.user.findUnique({
       where: { id: userDetails.id },
       include: { nodes: true },

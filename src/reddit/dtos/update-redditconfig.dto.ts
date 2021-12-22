@@ -1,6 +1,9 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateConfigDto {
+export class UpdateConfigDto {
+  @IsNumber()
+  id: number;
+
   @IsString()
   userId: string;
 

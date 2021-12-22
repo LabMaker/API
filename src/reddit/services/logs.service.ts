@@ -10,11 +10,15 @@ export class LogsService implements ILog {
   constructor(private prismaService: PrismaService) {}
 
   async getLogs(nodeId: number): Promise<Log[]> {
-    return await this.prismaService.log.findMany({
+    const logs = await this.prismaService.log.findMany({
       take: 250,
       orderBy: { id: 'desc' },
       where: { nodeId },
     });
+
+    if (logs) return logs;
+
+    return [];
   }
 
   async queryGetLogs(nodeId: number, query: LogQueryParms): Promise<Log[]> {

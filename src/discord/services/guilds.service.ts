@@ -6,6 +6,7 @@ import { Guild } from '../dtos/Guild.dto';
 import { UserService } from '../../user/user.service';
 import { IGuild } from '../interfaces/guild.interface';
 import { PrismaService } from '../../prisma.service';
+import { DiscordConfig } from '.prisma/client';
 
 @Injectable()
 export class GuildsService implements IGuild {
@@ -42,9 +43,8 @@ export class GuildsService implements IGuild {
 
     await Promise.all(
       validGuilds.map(async (guild) => {
-        const storedGuild = await this.prismaService.discordConfig.update({
+        const storedGuild = await this.prismaService.discordConfig.findUnique({
           where: { id: guild.id },
-          data: guild,
         });
 
         if (storedGuild) {
@@ -56,6 +56,19 @@ export class GuildsService implements IGuild {
           validGuilds.splice(validGuilds.indexOf(guild), 1);
           validGuilds.splice(spliceIndex, 0, guild);
 
+          let gIcon = guild.icon;
+          //Fix to insert emprt
+          if (!gIcon) {
+            gIcon = 'na';
+          }
+
+          await this.prismaService.discordConfig.update({
+            where: { id: guild.id },
+            data: {
+              name: guild.name,
+              icon: gIcon,
+            },
+          });
           //Uncomment and see what this does once Branch is merged with master
           // validGuilds.filter((lGuild) => lGuild.id !== guild.id);
           spliceIndex++;
@@ -71,6 +84,7 @@ export class GuildsService implements IGuild {
     const config = await this.prismaService.discordConfig.findUnique({
       where: { id: serverId },
     });
+    if (!config) return;
 
     const payments = await this.prismaService.payment.findMany({
       where: { serverId: config.paymentConfigId },

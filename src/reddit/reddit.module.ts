@@ -4,9 +4,10 @@ import { ConfigController } from './controllers/config.controller';
 import { LogsService } from './services/logs.service';
 import { LogsController } from './controllers/logs.controller';
 import { PrismaService } from '../prisma.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [],
+  imports: [HttpModule],
   providers: [
     {
       provide: 'REDDIT_CONFIG_SERVICE',
