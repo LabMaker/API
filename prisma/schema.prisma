@@ -31,7 +31,7 @@ model RedditConfig {
   title String
   pmBody String
   subreddits String[]
-  forbiddenWords String[]
+  forbiddenWords String[] 
   blockedUsers String[]
   userId String
   creator User @relation(fields: [userId], references: [id])

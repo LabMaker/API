@@ -2,10 +2,6 @@ import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateLogDto {
   @IsNumber()
-  @IsOptional()
-  id: number;
-
-  @IsNumber()
   nodeId: number;
 
   @IsString()
