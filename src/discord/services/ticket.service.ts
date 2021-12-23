@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTicketDto } from '../dtos/create-ticket.dto';
+import { CreateTicketDto, UpdateTicketDto } from '../dtos/create-ticket.dto';
 import { ITicketService } from '../interfaces/ticket.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../prisma.service';
@@ -9,7 +9,7 @@ import { Ticket } from '@prisma/client';
 export class TicketService implements ITicketService {
   constructor(private prismaService: PrismaService) {}
 
-  async getTicket(serverId: string, ticketId: string): Promise<Ticket> {
+  async getTicket(serverId: string, ticketId: number): Promise<Ticket> {
     //Update Database to make ServerId + TicketID + Channel ID Unique Combination
     return await this.prismaService.ticket.findFirst({
       where: { serverId, ticketId },
@@ -24,7 +24,7 @@ export class TicketService implements ITicketService {
     return await this.prismaService.ticket.create({ data: newTicketDto });
   }
 
-  async updateConfig(updateTicketDto: CreateTicketDto): Promise<any> {
+  async updateConfig(updateTicketDto: UpdateTicketDto): Promise<any> {
     return await this.prismaService.ticket.update({
       where: { id: updateTicketDto.id },
       data: updateTicketDto,

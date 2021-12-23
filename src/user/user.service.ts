@@ -14,7 +14,6 @@ export class UserService {
   ) {}
 
   async getUser(userDetails: UserDetails): Promise<UserDto> {
-    Logger.error(userDetails, 'User');
     const user = await this.prismaService.user.findUnique({
       where: { id: userDetails.id },
       include: { nodes: true },

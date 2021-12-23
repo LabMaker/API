@@ -27,3 +27,4 @@ export class UpdateConfigDto {
   @IsBoolean()
   autoReact: boolean;
 }
+

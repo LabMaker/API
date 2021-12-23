@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Inject,
+  Logger,
   Param,
   Post,
   Put,
@@ -19,6 +20,8 @@ export class ConfigController {
     @Inject('DISCORD_CONFIG_SERVICE')
     private readonly configService: IDiscordConfig,
   ) {}
+
+  private context = 'DiscordConfigController';
 
   // @UseGuards(AuthGuard('jwt'))
   @UseGuards(JwtAuthGuard)

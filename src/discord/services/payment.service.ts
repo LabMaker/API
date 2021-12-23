@@ -1,5 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePaymentDto } from '../dtos/create-payment.dto';
+import { Injectable, Logger } from '@nestjs/common';
+import {
+  CreatePaymentDto,
+  CreatePaymentDtoArray,
+  UpdatePaymentDto,
+} from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../prisma.service';
@@ -13,14 +17,17 @@ export class PaymentService implements IPaymentService {
     return await this.prismaService.payment.findMany({ where: { serverId } });
   }
 
-  async createPayments(payments: CreatePaymentDto[]): Promise<Payment[] | any> {
+  async createPayments(
+    paymentArray: CreatePaymentDtoArray,
+  ): Promise<Payment[] | any> {
+    Logger.error(JSON.stringify(paymentArray), 'PaymentArray');
     return await this.prismaService.payment.createMany({
-      data: payments,
+      data: paymentArray.payments,
     });
   }
 
   async updatPayments(
-    updatedPayments: CreatePaymentDto[],
+    updatedPayments: UpdatePaymentDto[],
   ): Promise<Payment[] | any> {
     const savedPayments = [];
     await Promise.all(

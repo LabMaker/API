@@ -42,8 +42,8 @@ model RedditConfig {
 //Discord Configs
 model DiscordConfig {
   id String @id
-  name String
-  icon String
+  name String?
+  icon String?
   prefix String @default("?")
   embedImageUrl String @default("https://i.imgur.com/rDzblHE.gif")
   autoSwicher Boolean @default(false)
@@ -67,7 +67,7 @@ model Payment {
 //It is Finished.
 model Ticket {
   id Int @id @default(autoincrement())
-  ticketId String //Ticket ID is the ID of the Channel Name not database ID
+  ticketId Int //Ticket ID is the ID of the Channel Name not database ID
   serverId String
   channelId String
   type String @default("")

@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { Ticket } from '@prisma/client';
-import { CreateTicketDto } from '../dtos/create-ticket.dto';
+import { CreateTicketDto, UpdateTicketDto } from '../dtos/create-ticket.dto';
 import { ITicketService } from '../interfaces/ticket.interface';
 
 @Controller('discord/ticket')
@@ -21,7 +21,7 @@ export class TicketController {
   @Get('/:serverId/:ticketId')
   getTicket(
     @Param('serverId') serverId: string,
-    @Param('ticketId') ticketId: string,
+    @Param('ticketId') ticketId: number,
   ): Promise<Ticket> | any {
     return this.ticketService.getTicket(serverId, ticketId);
   }
@@ -37,7 +37,7 @@ export class TicketController {
   }
 
   @Put()
-  updateTicket(@Body() body: CreateTicketDto): Promise<Ticket> {
+  updateTicket(@Body() body: UpdateTicketDto): Promise<Ticket> {
     return this.ticketService.updateConfig(body);
   }
 

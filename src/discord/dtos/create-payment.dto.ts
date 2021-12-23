@@ -1,10 +1,15 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  Allow,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreatePaymentDto {
-  @IsOptional()
-  @IsNumber()
-  id: number;
-
   @IsString()
   serverId: string;
 
@@ -16,4 +21,23 @@ export class CreatePaymentDto {
 
   @IsString()
   type: string;
+}
+
+export class UpdatePaymentDto extends CreatePaymentDto {
+  @IsOptional()
+  @IsNumber()
+  id: number;
+}
+
+export class CreatePaymentDtoArray {
+  @ValidateNested({ each: true })
+  @Type(() => CreatePaymentDto)
+  @Allow()
+  payments: CreatePaymentDto[];
+}
+
+export class UpdatePaymentDtoArray {
+  @ValidateNested({ each: true })
+  @Type(() => UpdatePaymentDto)
+  payments: UpdatePaymentDto[];
 }

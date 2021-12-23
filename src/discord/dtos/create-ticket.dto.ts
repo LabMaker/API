@@ -1,12 +1,8 @@
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTicketDto {
-  @IsOptional()
   @IsNumber()
-  id: number;
-
-  @IsString()
-  ticketId: string;
+  ticketId: number;
 
   @IsString()
   serverId: string;
@@ -37,4 +33,10 @@ export class CreateTicketDto {
   @IsOptional()
   @IsBoolean()
   submitted: boolean;
+}
+
+export class UpdateTicketDto extends CreateTicketDto {
+  @IsOptional()
+  @IsNumber()
+  id: number;
 }
