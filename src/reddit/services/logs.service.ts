@@ -17,7 +17,6 @@ export class LogsService implements ILog {
     });
 
     if (logs) return logs;
-
     return [];
   }
 

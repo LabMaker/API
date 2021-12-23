@@ -87,5 +87,6 @@ model Log {
   username String
   subreddit String
   pm Boolean
+  createdAt DateTime @default(now())
   redditConfig RedditConfig @relation(fields: [nodeId], references: [id])
 }
