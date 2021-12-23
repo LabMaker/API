@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../../auth/userDetails.dto';
-import { PrismaService } from '../../prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';

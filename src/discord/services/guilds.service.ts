@@ -5,8 +5,8 @@ import { UserDetails } from '../../auth/userDetails.dto';
 import { Guild } from '../dtos/Guild.dto';
 import { UserService } from '../../user/user.service';
 import { IGuild } from '../interfaces/guild.interface';
-import { PrismaService } from '../../prisma.service';
 import { DiscordConfig } from '.prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class GuildsService implements IGuild {

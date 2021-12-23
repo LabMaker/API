@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IDiscordConfig } from '../interfaces/config.interface';
 import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
-import { PrismaService } from '../../prisma.service';
 import { DiscordConfig } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ConfigService implements IDiscordConfig {

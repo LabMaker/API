@@ -6,8 +6,8 @@ import {
 } from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaService } from '../../prisma.service';
 import { Payment } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class PaymentService implements IPaymentService {

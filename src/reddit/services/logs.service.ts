@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateLogDto } from '../dtos/create-log.dto';
 import { ILog } from '../interfaces/log.interface';
 import { LogQueryParms } from '../controllers/logs.controller';
-import { PrismaService } from '../../prisma.service';
 import { Log } from '.prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class LogsService implements ILog {

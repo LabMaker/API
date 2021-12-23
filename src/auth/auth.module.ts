@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { PrismaService } from '../prisma.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DiscordStrategy } from './strategy/discord.strategy';
@@ -19,7 +18,6 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     DiscordStrategy,
     { provide: 'AUTH_SERVICE', useClass: AuthService },
     JwtStrategy,
-    PrismaService,
   ],
 })
 export class AuthModule {}

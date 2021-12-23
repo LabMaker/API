@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto/User.dto';
 
 @Injectable()

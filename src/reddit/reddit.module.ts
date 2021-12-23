@@ -3,7 +3,6 @@ import { ConfigService } from './services/config.service';
 import { ConfigController } from './controllers/config.controller';
 import { LogsService } from './services/logs.service';
 import { LogsController } from './controllers/logs.controller';
-import { PrismaService } from '../prisma.service';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
@@ -17,7 +16,6 @@ import { HttpModule } from '@nestjs/axios';
       provide: 'LOG_SERVICE',
       useClass: LogsService,
     },
-    PrismaService,
   ],
   controllers: [ConfigController, LogsController],
 })
