@@ -12,6 +12,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class PaymentService implements IPaymentService {
   constructor(private prismaService: PrismaService) {}
+  private readonly logger = new Logger(PaymentService.name);
 
   async getPayments(serverId: string): Promise<Payment[]> {
     return await this.prismaService.payment.findMany({ where: { serverId } });
@@ -20,7 +21,7 @@ export class PaymentService implements IPaymentService {
   async createPayments(
     paymentArray: CreatePaymentDtoArray,
   ): Promise<Payment[] | any> {
-    Logger.error(JSON.stringify(paymentArray), 'PaymentArray');
+    this.logger.error(JSON.stringify(paymentArray));
     return await this.prismaService.payment.createMany({
       data: paymentArray.payments,
     });

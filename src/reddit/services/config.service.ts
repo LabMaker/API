@@ -19,6 +19,7 @@ export class ConfigService implements IRedditConfig {
     private prismaService: PrismaService,
     @Inject(HttpService) private readonly httpService: HttpService,
   ) {}
+  private readonly logger = new Logger(ConfigService.name);
 
   async getConfig(id: number): Promise<RedditConfig> {
     //Send Back X Amount OF Logs
@@ -45,19 +46,19 @@ export class ConfigService implements IRedditConfig {
 
   async getConfigs(user: UserDetails): Promise<RedditConfig[]> {
     if (user.type !== 'Bot') throw new UnauthorizedException();
-    Logger.log('Reddit Bot Client Requesting Configs', 'Config');
+    this.logger.log('Reddit Bot Client Requesting Configs');
 
     return await this.prismaService.redditConfig.findMany();
   }
 
   async createConfig(newConfig: CreateConfigDto): Promise<RedditConfig> {
-    Logger.log(JSON.stringify(newConfig), 'RedditConfig');
+    this.logger.log(JSON.stringify(newConfig));
     try {
       return await this.prismaService.redditConfig.create({
         data: newConfig,
       });
     } catch (err) {
-      Logger.error(err, 'Config');
+      this.logger.error(err);
       return;
     }
   }
@@ -93,7 +94,7 @@ export class ConfigService implements IRedditConfig {
     const data = this.httpService.get(`https://reddit.com/user/${username}`);
     const htmlPage = await (await lastValueFrom(data)).data;
 
-    // Logger.log(data);
+    // this.logger.log(data);
 
     return htmlPage;
     //*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[2]/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[2]/img

@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Inject,
-  Logger,
   Param,
   Post,
   Put,
@@ -61,7 +60,6 @@ export class ConfigController {
 
   @Get('image/profile')
   getProfile(): Promise<any> {
-    Logger.log('Running Image/Profile', 'Config Controller');
     return this.configService.getProfile('chikybacon');
   }
 }

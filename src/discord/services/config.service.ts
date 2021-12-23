@@ -8,10 +8,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class ConfigService implements IDiscordConfig {
   constructor(private prismaService: PrismaService) {}
-  private context = 'DiscordConfig';
+  private readonly logger = new Logger(ConfigService.name);
 
   async getConfig(id: string): Promise<DiscordConfig> {
-    Logger.log('Client Requesting Config', this.context);
+    this.logger.log('Client Requesting Config');
     const config = await this.prismaService.discordConfig.findUnique({
       where: { id },
     });
@@ -30,7 +30,7 @@ export class ConfigService implements IDiscordConfig {
   async createConfig(newConfig: CreateConfigDto): Promise<DiscordConfig> {
     //Not Sure Why this is here Move Over to Client Side
     newConfig.paymentConfigId = newConfig.id;
-    Logger.log('Attempting to Create New Server Config', this.context);
+    this.logger.log('Attempting to Create New Server Config');
     return await this.prismaService.discordConfig.create({ data: newConfig });
   }
 

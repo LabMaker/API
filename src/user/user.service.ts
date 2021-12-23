@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';

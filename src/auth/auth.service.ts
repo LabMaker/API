@@ -1,17 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserDetails } from './userDetails.dto';
 import { Response, Request } from 'express';
 import { User } from '.prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, Logger } from '@nestjs/common';
+
 @Injectable()
 export class AuthService {
   constructor(
     private prismaService: PrismaService,
     private jwtService: JwtService,
   ) {}
-
-  private context = 'Auth';
+  private readonly logger = new Logger(AuthService.name);
 
   async validateUser(details: UserDetails) {
     const { id } = details;
@@ -39,17 +39,17 @@ export class AuthService {
 
   async createBotToken() {
     const botToken = this.createBotAccessToken();
-    console.log(botToken); //Console.Logged As We Dont want to expose this to the public
+    this.logger.error(botToken); //Logged As We Dont want to expose this to the public
     //In the future it will be re-writing to check for Auth and make the Token less powerful than it is (CUrrently can do anything)
     return;
   }
 
   async refreshToken(res: Response, req: Request) {
     const token = req.cookies.jid;
-    Logger.log(`Refresh Token - Auth Service ${token}`, this.context);
+    this.logger.log(`Refresh Token - Auth Service ${token}`);
 
     if (!token) {
-      Logger.warn(`Empty Token`);
+      this.logger.warn(`Empty Token`);
       return res.send({ ok: false, accessToken: '' });
     }
 
@@ -58,7 +58,7 @@ export class AuthService {
     try {
       payload = this.jwtService.verify(token, { secret: 'refreshSecret' });
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       return res.send({ ok: false, accessToken: '' });
     }
 

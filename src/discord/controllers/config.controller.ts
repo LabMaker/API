@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Inject,
-  Logger,
   Param,
   Post,
   Put,
