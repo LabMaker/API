@@ -12,6 +12,7 @@ import { Payment } from '@prisma/client';
 import {
   CreatePaymentDto,
   CreatePaymentDtoArray,
+  UpdatePaymentDtoArray,
 } from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 
@@ -35,7 +36,7 @@ export class PaymentController {
   }
 
   @Put()
-  updatePayments(@Body() body: CreatePaymentDto[]): Promise<Payment[]> {
+  updatePayments(@Body() body: UpdatePaymentDtoArray): Promise<Payment[]> {
     return this.paymentService.updatPayments(body);
   }
 

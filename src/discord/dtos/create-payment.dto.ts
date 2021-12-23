@@ -32,7 +32,6 @@ export class UpdatePaymentDto extends CreatePaymentDto {
 export class CreatePaymentDtoArray {
   @ValidateNested({ each: true })
   @Type(() => CreatePaymentDto)
-  @Allow()
   payments: CreatePaymentDto[];
 }
 

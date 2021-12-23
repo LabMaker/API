@@ -3,6 +3,7 @@ import {
   CreatePaymentDto,
   CreatePaymentDtoArray,
   UpdatePaymentDto,
+  UpdatePaymentDtoArray,
 } from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,11 +29,13 @@ export class PaymentService implements IPaymentService {
   }
 
   async updatPayments(
-    updatedPayments: UpdatePaymentDto[],
+    updatedPayments: UpdatePaymentDtoArray,
   ): Promise<Payment[] | any> {
     const savedPayments = [];
+    const { payments } = updatedPayments;
+
     await Promise.all(
-      updatedPayments.map(async (payment) => {
+      payments.map(async (payment) => {
         const updatedPayment = await this.prismaService.payment.update({
           where: { id: payment.id },
           data: payment,
