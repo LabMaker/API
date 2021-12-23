@@ -22,10 +22,18 @@ export class PaymentService implements IPaymentService {
   async createPayments(
     paymentArray: CreatePaymentDtoArray,
   ): Promise<Payment[] | any> {
-    this.logger.error(JSON.stringify(paymentArray));
-    return await this.prismaService.payment.createMany({
+    //CreateMany doesnt return created objects which we need.
+
+    /* return await this.prismaService.payment.createMany({
       data: paymentArray.payments,
     });
+    */
+
+    return await this.prismaService.$transaction(
+      paymentArray.payments.map((payment) =>
+        this.prismaService.payment.create({ data: payment }),
+      ),
+    );
   }
 
   async updatPayments(
