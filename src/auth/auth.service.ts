@@ -54,7 +54,6 @@ export class AuthService {
     }
 
     let payload: any = null;
-
     try {
       payload = this.jwtService.verify(token, {
         secret: process.env.JWT_REFRESH_SECRET,
@@ -99,7 +98,7 @@ export class AuthService {
         type: type,
         tokenVersion: user.tokenVersion,
       },
-      { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '7d' },
+      { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' },
     );
   }
 
@@ -111,7 +110,7 @@ export class AuthService {
         discriminator: user.discriminator,
         type: type,
       },
-      { secret: process.env.JWT_TOKEN, expiresIn: '15m' },
+      { secret: process.env.JWT_SECRET, expiresIn: '15m' },
     );
   }
 
@@ -121,7 +120,7 @@ export class AuthService {
         sub: '10019',
         type: 'Bot',
       },
-      { secret: process.env.JWT_TOKEN, expiresIn: '1y' },
+      { secret: process.env.JWT_SECRET, expiresIn: '1y' },
     );
   }
 }
