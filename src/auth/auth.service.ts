@@ -47,7 +47,6 @@ export class AuthService {
   async refreshToken(res: Response, req: Request) {
     const token = req.cookies.jid;
     this.logger.log(`Refresh Token - Auth Service ${token}`);
-    this.logger.error(process.env.JWT_SECRET);
 
     if (!token) {
       this.logger.warn(`Empty Token`);
@@ -61,7 +60,6 @@ export class AuthService {
       });
     } catch (err) {
       this.logger.error(err);
-      this.logger.log('Erro Hit?');
       return res.send({ ok: false, accessToken: '' });
     }
 
@@ -105,7 +103,6 @@ export class AuthService {
   }
 
   createAccessToken(user: User, type: string) {
-    this.logger.error(process.env.JWT_SECRET);
     return this.jwtService.sign(
       {
         sub: user.id,
