@@ -1,21 +1,23 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { User } from '@prisma/client';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';
-import { User, UserDocument } from '../schemas/UserSchema';
+import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto/User.dto';
 
 @Injectable()
 export class UserService {
   constructor(
+    private prismaService: PrismaService,
     @Inject(HttpService) private readonly httpService: HttpService,
-    @InjectModel(User.name) private userRepo: Model<UserDocument>,
   ) {}
 
   async getUser(userDetails: UserDetails): Promise<UserDto> {
-    const user = await this.userRepo.findById(userDetails._id);
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userDetails.id },
+      include: { nodes: true },
+    });
 
     const fetchedUser = this.httpService.get(
       `https://discord.com/api/v9/users/@me`,
@@ -25,25 +27,30 @@ export class UserService {
         },
       },
     );
+
     const discordUser = await (await lastValueFrom(fetchedUser)).data;
-    await this.userRepo.findOneAndUpdate({ _id: discordUser.id }, discordUser, {
-      useFindAndModify: false,
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: discordUser.id },
+      data: {
+        username: discordUser.username,
+        discriminator: discordUser.discriminator,
+        avatar: discordUser.avatar,
+        accessToken: discordUser.accessToken,
+        refreshToken: discordUser.refreshToken,
+      },
     });
 
-    console.log(discordUser);
-
     return {
-      _id: user._id,
-      username: user.username,
-      discriminator: user.discriminator,
-      avatar: user.avatar,
+      id: updatedUser.id,
+      username: updatedUser.username,
+      discriminator: updatedUser.discriminator,
+      avatar: updatedUser.avatar,
       nodes: user.nodes,
     };
   }
 
   async getUserDetails(id: string): Promise<User> {
-    const user = await this.userRepo.findById(id);
-
-    return user;
+    return await this.prismaService.user.findUnique({ where: { id } });
   }
 }

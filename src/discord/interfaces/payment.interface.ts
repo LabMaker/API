@@ -1,9 +1,12 @@
-import { Payment } from '../../schemas/PaymentSchema';
-import { CreatePaymentDto } from '../dtos/create-payment.dto';
+import { Payment } from '@prisma/client';
+import {
+  CreatePaymentDtoArray,
+  UpdatePaymentDtoArray,
+} from '../dtos/create-payment.dto';
 
 export interface IPaymentService {
-  getPayments(nodeId: string): Promise<Payment[]>;
-  createPayments(payments: CreatePaymentDto[]): Promise<Payment | any>;
-  updatPayments(updatedPayments: CreatePaymentDto[]): Promise<Payment[]>;
-  deletePayments(deleteIds: string[]);
+  getPayments(serverId: string): Promise<Payment[]>;
+  createPayments(payments: CreatePaymentDtoArray): Promise<Payment | any>;
+  updatPayments(updatedPayments: UpdatePaymentDtoArray): Promise<Payment[]>;
+  deletePayments(deleteIds: number[]);
 }

@@ -1,84 +1,102 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
-import { UserDetails } from '../../auth/userDetails.dto';
+import { RedditConfig } from '.prisma/client';
+import { HttpService } from '@nestjs/axios';
 import {
-  RedditConfig,
-  RedditConfigDocument,
-} from '../../schemas/RedditConfigSchema';
-import { User, UserDocument } from '../../schemas/UserSchema';
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { lastValueFrom } from 'rxjs';
+import { UserDetails } from '../../auth/userDetails.dto';
+import { PrismaService } from '../../prisma/prisma.service';
 import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
+import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
 @Injectable()
 export class ConfigService implements IRedditConfig {
   constructor(
-    @InjectModel(RedditConfig.name)
-    private redditConfigRepository: Model<RedditConfigDocument>,
-    @InjectModel(User.name) private userRepo: Model<UserDocument>,
+    private prismaService: PrismaService,
+    @Inject(HttpService) private readonly httpService: HttpService,
   ) {}
+  private readonly logger = new Logger(ConfigService.name);
 
-  async getConfig(_id: string): Promise<RedditConfig> {
-    return await this.redditConfigRepository.findOne({
-      _id,
+  async getConfig(id: number): Promise<RedditConfig> {
+    //Send Back X Amount OF Logs
+    //Not Sure if You can filter Logs Like This in Relationships (Could Manually Query Logs Instead?)
+    // let configs =  await this.prismaService.redditConfig.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    //   include: {
+    //     _count: {
+    //       select: {
+    //         logs: true,
+    //       },
+    //     },
+    //   },
+    // });
+
+    return await this.prismaService.redditConfig.findUnique({
+      where: {
+        id,
+      },
     });
   }
 
   async getConfigs(user: UserDetails): Promise<RedditConfig[]> {
     if (user.type !== 'Bot') throw new UnauthorizedException();
-    console.log('IM IN');
+    this.logger.log('Reddit Bot Client Requesting Configs');
 
-    return await this.redditConfigRepository.find();
+    return await this.prismaService.redditConfig.findMany();
   }
 
-  async createConfig(
-    newConfig: CreateConfigDto,
-    user: UserDetails,
-  ): Promise<RedditConfig> {
-    newConfig._id = uuidv4();
+  async createConfig(newConfig: CreateConfigDto): Promise<RedditConfig> {
+    this.logger.log(JSON.stringify(newConfig));
     try {
-      const createdConfig = new this.redditConfigRepository(newConfig);
-      const savedUser = await createdConfig.save();
-      await this.userRepo.findByIdAndUpdate(user._id, {
-        $addToSet: { nodes: newConfig._id },
+      return await this.prismaService.redditConfig.create({
+        data: newConfig,
       });
-      return savedUser;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       return;
     }
   }
 
-  async updateConfig(updateConfigDto: CreateConfigDto): Promise<any> {
-    const filter = { _id: updateConfigDto._id };
-    return await this.redditConfigRepository.findOneAndUpdate(
-      filter,
-      updateConfigDto,
-      {
-        new: true,
-        useFindAndModify: false,
-      },
-    );
-  }
+  async updateConfig(updateConfigDto: UpdateConfigDto): Promise<any> {
+    const filter = { id: updateConfigDto.id };
 
-  async updateMessage(_id: string, message: string): Promise<any> {
-    const filter = { _id };
-    return await this.redditConfigRepository.findOneAndUpdate(
-      filter,
-      { pmBody: message },
-      {
-        new: true,
-        useFindAndModify: false,
-      },
-    );
-  }
-
-  async deleteConfig(_id: string, user: UserDetails): Promise<any> {
-    await this.redditConfigRepository.deleteOne({ _id });
-    await this.userRepo.findByIdAndUpdate(user._id, {
-      $pull: { nodes: _id },
+    return await this.prismaService.redditConfig.update({
+      where: filter,
+      data: updateConfigDto,
     });
+  }
+
+  async updateMessage(id: number, message: string): Promise<any> {
+    return await this.prismaService.redditConfig.update({
+      where: { id },
+      data: { pmBody: message },
+    });
+  }
+
+  async deleteConfig(id: number): Promise<any> {
+    await this.prismaService.redditConfig.delete({ where: { id } });
     return;
+  }
+
+  //Fix Function
+  async getProfile(username: string): Promise<any> {
+    const xPathValue = `//*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[2]/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[2]/img`;
+    // const htmlPage = this.httpService
+    // .get(`https://reddit.com/user/${username}`)
+    // .pipe(map((response) => response.data));
+
+    const data = this.httpService.get(`https://reddit.com/user/${username}`);
+    const htmlPage = await (await lastValueFrom(data)).data;
+
+    // this.logger.log(data);
+
+    return htmlPage;
+    //*[@id="SHORTCUT_FOCUSABLE_DIV"]/div[2]/div/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[2]/img
   }
 }

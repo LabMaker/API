@@ -1,11 +1,21 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateConfigDto {
   @IsString()
-  _id: string;
+  id: string;
 
+  @IsOptional()
   @IsString()
-  paymentConfigId: string;
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  icon: string;
 
   @IsOptional()
   @IsString()
@@ -14,6 +24,10 @@ export class CreateConfigDto {
   @IsOptional()
   @IsString()
   embedImageUrl: string;
+
+  @IsOptional()
+  @IsString()
+  paymentConfigId: string;
 
   @IsOptional()
   @IsBoolean()

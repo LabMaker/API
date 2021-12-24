@@ -12,7 +12,6 @@ export class UserController {
   @Get('')
   @UseGuards(JwtAuthGuard)
   getUser(@CurrentUser() user: UserDetails): Promise<UserDto> {
-    console.log(user);
     return this.userService.getUser(user);
   }
 }

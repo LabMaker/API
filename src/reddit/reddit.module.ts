@@ -1,24 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from './services/config.service';
 import { ConfigController } from './controllers/config.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import {
-  RedditConfig,
-  RedditConfigSchema,
-} from '../schemas/RedditConfigSchema';
 import { LogsService } from './services/logs.service';
 import { LogsController } from './controllers/logs.controller';
-import { Log, LogSchema } from '../schemas/LogSchema';
-import { User, UserSchema } from '../schemas/UserSchema';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: RedditConfig.name, schema: RedditConfigSchema },
-      { name: Log.name, schema: LogSchema },
-      { name: User.name, schema: UserSchema },
-    ]),
-  ],
+  imports: [HttpModule],
   providers: [
     {
       provide: 'REDDIT_CONFIG_SERVICE',
