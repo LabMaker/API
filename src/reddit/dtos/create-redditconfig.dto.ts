@@ -36,4 +36,13 @@ export class CreateConfigDto {
   @IsOptional()
   @IsString({ each: true })
   blockedUsers: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  nodeEditors: string[];
+}
+
+export class UpdateConfigDto extends CreateConfigDto {
+  @IsNumber()
+  id: number;
 }

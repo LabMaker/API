@@ -9,8 +9,10 @@ import {
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
-import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
+import {
+  CreateConfigDto,
+  UpdateConfigDto,
+} from '../dtos/create-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
 @Injectable()
@@ -63,12 +65,14 @@ export class ConfigService implements IRedditConfig {
     }
   }
 
-  async updateConfig(updateConfigDto: UpdateConfigDto): Promise<any> {
-    const filter = { id: updateConfigDto.id };
+  async updateConfig(ucd: UpdateConfigDto): Promise<any> {
+    const filter = { id: ucd.id };
+    ucd.nodeEditors = ucd.nodeEditors.filter((userId) => userId !== ucd.userId);
 
+    ucd.nodeEditors = [...new Set(ucd.nodeEditors)];
     return await this.prismaService.redditConfig.update({
       where: filter,
-      data: updateConfigDto,
+      data: ucd,
     });
   }
 

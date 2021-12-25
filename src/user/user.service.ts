@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../auth/userDetails.dto';
@@ -12,6 +12,7 @@ export class UserService {
     private prismaService: PrismaService,
     @Inject(HttpService) private readonly httpService: HttpService,
   ) {}
+  private logger = new Logger(UserService.name);
 
   async getUser(userDetails: UserDetails): Promise<UserDto> {
     const user = await this.prismaService.user.findUnique({
@@ -41,12 +42,20 @@ export class UserService {
       },
     });
 
+    const extraNodes = await this.prismaService.redditConfig.findMany({
+      where: { nodeEditors: { has: user.id } },
+    });
+
+    //Ensures Duplicate Nodes arent sent. (This is already handled on the client side + API endpoiint for updating but its better)
+    //To be safe if its only one line to check.
+    const userNodes = [...new Set(user.nodes)].concat(extraNodes);
+
     return {
       id: updatedUser.id,
       username: updatedUser.username,
       discriminator: updatedUser.discriminator,
       avatar: updatedUser.avatar,
-      nodes: user.nodes,
+      nodes: userNodes,
     };
   }
 

@@ -1,7 +1,9 @@
 import { RedditConfig } from '.prisma/client';
 import { UserDetails } from '../../auth/userDetails.dto';
-import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
-import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
+import {
+  CreateConfigDto,
+  UpdateConfigDto,
+} from '../dtos/create-redditconfig.dto';
 
 export interface IRedditConfig {
   getConfig(id: number): Promise<RedditConfig>;

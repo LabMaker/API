@@ -13,8 +13,10 @@ import { RedditConfig } from '@prisma/client';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
 import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
-import { CreateConfigDto } from '../dtos/create-redditconfig.dto';
-import { UpdateConfigDto } from '../dtos/update-redditconfig.dto';
+import {
+  CreateConfigDto,
+  UpdateConfigDto,
+} from '../dtos/create-redditconfig.dto';
 import { IRedditConfig } from '../interfaces/config.interface';
 
 @Controller('reddit/config')

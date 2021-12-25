@@ -34,6 +34,7 @@ model RedditConfig {
   forbiddenWords String[] 
   blockedUsers String[]
   userId String
+  nodeEditors String[]
   creator User @relation(fields: [userId], references: [id])
   logs Log[]
 }
