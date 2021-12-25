@@ -20,7 +20,7 @@ export class AuthService {
 
     try {
       return await this.jwtService.verifyAsync(token, {
-        secret: 'jwtSecret',
+        secret: process.env.JWT_SECRET,
       });
     } catch (err) {
       console.error('Attempted to verify invalid token:', token, err.message);

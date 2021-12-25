@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { JwtAuthGuard } from '../utils/guards/Jwt.guard';
+import { JwtAuthGuard } from '../auth/guards/Jwt.guard';
 import { PayPalService } from './paypal.service';
 
 @Controller('pay')

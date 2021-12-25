@@ -1,10 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import * as paypal from '@paypal/checkout-server-sdk';
-import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
-import { Ticket, TicketDocument } from '../schemas/TicketSchema';
+import { PrismaService } from '../prisma/prisma.service';
 import { PayGatewayOperation } from './dtos/PayGatewayMessage.dto';
 import { PayGateway } from './pay.gateway';
 
@@ -16,7 +14,7 @@ export class PayPalService {
   constructor(
     private readonly payGateway: PayGateway,
     private httpService: HttpService,
-    @InjectModel(Ticket.name) private ticketModel: Model<TicketDocument>,
+    private prismaService: PrismaService,
   ) {}
 
   private get credentials() {
@@ -100,7 +98,9 @@ export class PayPalService {
     }
 
     // Make sure ticket exists in db
-    const ticket = await this.ticketModel.findOne({ channelId: channelId });
+    const ticket = await this.prismaService.ticket.findFirst({
+      where: { channelId: channelId },
+    });
     if (!ticket) {
       throw new HttpException(
         {
@@ -142,16 +142,10 @@ export class PayPalService {
     // Add order id to ticket.
     // TODO: After postgres migration, orders should be added to their own table linking back to
     // the ticket incase we have multiple orders per ticket.
-    await this.ticketModel.findByIdAndUpdate(
-      ticket._id,
-      {
-        transactionId: order.id,
-      },
-      {
-        // required in versions below 6
-        useFindAndModify: false,
-      },
-    );
+    await this.prismaService.ticket.update({
+      where: { id: ticket.id },
+      data: { transactionId: order.id },
+    });
 
     // Return checkout link if it exists
     let checkoutLink = order.links.find((e) => e.rel == 'approve').href;
@@ -241,8 +235,10 @@ export class PayPalService {
 
         // doesn't give us the purchase_units, only the tx id, so use that to get ticket again in db
         // for now, dont create new table for orders, do it after dan finishes change to postgres+prisma
-        const ticket = await this.ticketModel.findOne({
-          transactionId: oinfo.supplementary_data.related_ids.order_id,
+        const ticket = await this.prismaService.ticket.findFirst({
+          where: {
+            transactionId: oinfo.supplementary_data.related_ids.order_id,
+          },
         });
 
         if (ticket) {
