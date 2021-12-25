@@ -8,8 +8,8 @@ import { PayGateway } from './pay.gateway';
 
 @Injectable()
 export class PayPalService {
-  private context = 'PayPal Service'; // For logger
   private client = new paypal.core.PayPalHttpClient(this.environment());
+  private readonly logger = new Logger(PayPalService.name);
 
   constructor(
     private readonly payGateway: PayGateway,
@@ -152,11 +152,10 @@ export class PayPalService {
     if (checkoutLink) {
       return { url: checkoutLink };
     } else {
-      Logger.warn(
+      this.logger.warn(
         `Couldn't find checkout link amongst these links: ${JSON.stringify(
           order.links,
         )}`,
-        this.context,
       );
 
       throw new HttpException(
@@ -180,10 +179,7 @@ export class PayPalService {
     // Call API with your client and get a response for your call
     let response = await this.client.execute(request);
 
-    Logger.log(
-      `Capturing Order: ${JSON.stringify(response.result)}`,
-      this.context,
-    );
+    this.logger.log(`Capturing Order: ${JSON.stringify(response.result)}`);
   }
 
   /**
@@ -203,10 +199,7 @@ export class PayPalService {
 
         this.captureOrder(oinfo.id);
 
-        Logger.log(
-          `Checkout completed, attempting to capture funds..`,
-          this.context,
-        );
+        this.logger.log(`Checkout completed, attempting to capture funds..`);
       }
 
       // Checkout completed, but funds are still processing!
@@ -214,9 +207,8 @@ export class PayPalService {
         let oinfo = data.resource;
         let amount = oinfo.gross_amount;
 
-        Logger.log(
+        this.logger.log(
           `Payment of ${amount.value} ${amount.currency_code} is **processing**.`,
-          this.context,
         );
       }
 
@@ -228,9 +220,8 @@ export class PayPalService {
         const netStr = `${breakdown.net_amount.value}${breakdown.net_amount.currency_code}`;
         const feeStr = `${breakdown.paypal_fee.value}${breakdown.paypal_fee.currency_code}`;
 
-        Logger.log(
+        this.logger.log(
           `Captured A Payment. Net: ${netStr}, Paypal Fee: ${feeStr}`,
-          this.context,
         );
 
         // doesn't give us the purchase_units, only the tx id, so use that to get ticket again in db
@@ -264,11 +255,10 @@ export class PayPalService {
             },
           });
         } else {
-          Logger.error(
+          this.logger.error(
             `Payment Capture Completed, but couldn't find relating ticket! ${JSON.stringify(
               oinfo,
             )}`,
-            this.context,
           );
         }
       }
@@ -332,12 +322,12 @@ export class PayPalService {
       // Just pass through whole json body if error doesn't conform to fields in if above, so atleast we have everything we need to handle an error
       else msg += JSON.stringify(data);
 
-      Logger.error(msg, this.context);
+      this.logger.error(msg);
       return false;
     }
 
     // If true isn't returned above, then we must have failed somewhere
-    Logger.warn('Invalid webhook recieved', this.context);
+    this.logger.warn('Invalid webhook recieved');
     return false;
   }
 }
