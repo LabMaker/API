@@ -1,10 +1,10 @@
-import { Log } from '../../schemas/LogSchema';
+import { Log } from '@prisma/client';
 import { LogQueryParms } from '../controllers/logs.controller';
 import { CreateLogDto } from '../dtos/create-log.dto';
 
 export interface ILog {
-  getLogs(nodeId: string): Promise<Log[]>;
-  queryGetLogs(nodeId: string, query: LogQueryParms): Promise<Log[]>;
+  getLogs(nodeId: number): Promise<Log[]>;
+  queryGetLogs(nodeId: number, query: LogQueryParms): Promise<Log[]>;
   createLog(logConfigDto: CreateLogDto): Promise<Log>;
-  getSubmissionIds(nodeId: string): Promise<string[]>;
+  getSubmissionIds(nodeId: number): Promise<string[]>;
 }

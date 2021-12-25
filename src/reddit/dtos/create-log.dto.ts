@@ -1,11 +1,8 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateLogDto {
-  @IsString()
-  _id: string;
-
-  @IsString()
-  nodeId: string;
+  @IsNumber()
+  nodeId: number;
 
   @IsString()
   message: string;

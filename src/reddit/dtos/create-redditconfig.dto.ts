@@ -1,9 +1,8 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateConfigDto {
-  @IsOptional()
   @IsString()
-  _id: string;
+  userId: string;
 
   @IsString()
   clientId: string;
@@ -17,7 +16,6 @@ export class CreateConfigDto {
   @IsString()
   password: string;
 
-  @IsOptional()
   @IsString()
   userAgent: string;
 
@@ -38,4 +36,13 @@ export class CreateConfigDto {
   @IsOptional()
   @IsString({ each: true })
   blockedUsers: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  nodeEditors: string[];
+}
+
+export class UpdateConfigDto extends CreateConfigDto {
+  @IsNumber()
+  id: number;
 }

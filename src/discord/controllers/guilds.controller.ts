@@ -2,8 +2,8 @@ import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { Guild } from '../dtos/Guild.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
-import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
 import { IGuild } from '../interfaces/guild.interface';
+import { JwtAuthGuard } from '../../auth/guards/Jwt.guard';
 
 @Controller('discord/guilds')
 export class GuildsController {

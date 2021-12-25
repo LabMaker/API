@@ -1,50 +1,41 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Log, LogDocument } from '../../schemas/LogSchema';
+import { Injectable } from '@nestjs/common';
 import { CreateLogDto } from '../dtos/create-log.dto';
 import { ILog } from '../interfaces/log.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { LogQueryParms } from '../controllers/logs.controller';
+import { Log } from '.prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class LogsService implements ILog {
-  constructor(
-    @InjectModel(Log.name) private logRepository: Model<LogDocument>,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
-  async getLogs(nodeId: string): Promise<Log[]> {
-    return await this.logRepository
-      .find({
-        nodeId,
-        pm: true,
-      })
-      .sort({ createdAt: -1 })
-      .limit(250);
+  async getLogs(nodeId: number): Promise<Log[]> {
+    const logs = await this.prismaService.log.findMany({
+      take: 250,
+      orderBy: { id: 'desc' },
+      where: { nodeId },
+    });
+
+    if (logs) return logs;
+    return [];
   }
 
-  async queryGetLogs(nodeId: string, query: LogQueryParms): Promise<Log[]> {
-    console.log(query);
-    let filter: any = { nodeId };
+  async queryGetLogs(nodeId: number, query: LogQueryParms): Promise<Log[]> {
+    let filter = { nodeId, pm: false };
+
     if (query.pmOnly) {
-      console.log(query.pmOnly);
-      filter = { ...filter, pm: true };
+      filter.pm = true;
     }
-    
-    console.log(filter);
-    return await this.logRepository
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .limit(250);
+
+    return await this.prismaService.log.findMany({
+      take: 250,
+      orderBy: { id: 'desc' },
+      where: filter,
+    });
   }
 
-  async getSubmissionIds(nodeId: string): Promise<string[]> {
-    const logs = await this.logRepository
-      .find({
-        nodeId,
-      })
-      .sort({ createdAt: -1 })
-      .limit(300);
+  async getSubmissionIds(nodeId: number): Promise<string[]> {
+    const logs = await this.getLogs(nodeId);
 
     let submissionIds = [];
 
@@ -56,10 +47,6 @@ export class LogsService implements ILog {
   }
 
   async createLog(newLog: CreateLogDto): Promise<Log> {
-    newLog._id = uuidv4();
-
-    const createdLog = new this.logRepository(newLog);
-
-    return await createdLog.save();
+    return await this.prismaService.log.create({ data: newLog });
   }
 }

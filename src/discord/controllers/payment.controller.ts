@@ -8,8 +8,12 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Payment } from '../../schemas/PaymentSchema';
-import { CreatePaymentDto } from '../dtos/create-payment.dto';
+import { Payment } from '@prisma/client';
+import {
+  CreatePaymentDto,
+  CreatePaymentDtoArray,
+  UpdatePaymentDtoArray,
+} from '../dtos/create-payment.dto';
 import { IPaymentService } from '../interfaces/payment.interface';
 
 @Controller('discord/payment')
@@ -26,13 +30,13 @@ export class PaymentController {
 
   @Post()
   async createPayments(
-    @Body() body: CreatePaymentDto[],
+    @Body() body: CreatePaymentDtoArray,
   ): Promise<Payment[] | any> {
     return await this.paymentService.createPayments(body);
   }
 
   @Put()
-  updatePayments(@Body() body: CreatePaymentDto[]): Promise<Payment[]> {
+  updatePayments(@Body() body: UpdatePaymentDtoArray): Promise<Payment[]> {
     return this.paymentService.updatPayments(body);
   }
 

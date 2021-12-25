@@ -1,8 +1,9 @@
+import { RedditConfig } from '.prisma/client';
 import { IsString } from 'class-validator';
 
 export class UserDto {
   @IsString()
-  _id: string;
+  id: string;
 
   @IsString()
   username: string;
@@ -14,5 +15,5 @@ export class UserDto {
   avatar: string | null;
 
   @IsString({ each: true })
-  nodes: string[];
+  nodes: RedditConfig[];
 }

@@ -1,5 +1,5 @@
+import { User } from '@prisma/client';
 import { Request, Response } from 'express';
-import { User } from '../schemas/UserSchema';
 import { UserDetails } from './userDetails.dto';
 
 export interface AuthenticationProvider {

@@ -1,22 +1,19 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../schemas/UserSchema';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DiscordStrategy } from './strategy/discord.strategy';
-import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtBotStrategy, JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
-      secret: 'mysecret',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '15m' },
     }),
   ],
   exports: [AuthService],
   controllers: [AuthController],
-  providers: [DiscordStrategy, AuthService, JwtStrategy],
+  providers: [DiscordStrategy, AuthService, JwtStrategy, JwtBotStrategy],
 })
 export class AuthModule {}

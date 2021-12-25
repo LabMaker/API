@@ -1,13 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
-import { Log } from '../../schemas/LogSchema';
+import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Log } from '@prisma/client';
 import { CreateLogDto } from '../dtos/create-log.dto';
 import { ILog } from '../interfaces/log.interface';
 
@@ -20,7 +12,7 @@ export class LogsController {
   constructor(@Inject('LOG_SERVICE') private readonly logService: ILog) {}
 
   @Get('/:id')
-  getLog(@Param('id') nodeId: string): Promise<Log[]> {
+  getLog(@Param('id') nodeId: number): Promise<Log[]> {
     return this.logService.getLogs(nodeId);
   }
 
@@ -37,7 +29,7 @@ export class LogsController {
   // }
 
   @Get('submissions/:id')
-  getSubmissions(@Param('id') nodeId: string): Promise<string[]> {
+  getSubmissions(@Param('id') nodeId: number): Promise<string[]> {
     return this.logService.getSubmissionIds(nodeId);
   }
 
