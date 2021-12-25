@@ -15,12 +15,8 @@ import { JwtStrategy } from './strategy/jwt.strategy';
       signOptions: { expiresIn: '15m' },
     }),
   ],
-  // exports: [{ provide: 'AUTH_SERVICE', useClass: AuthService }],
+  exports: [AuthService],
   controllers: [AuthController],
-  providers: [
-    DiscordStrategy,
-    { provide: 'AUTH_SERVICE', useClass: AuthService },
-    JwtStrategy,
-  ],
+  providers: [DiscordStrategy, AuthService, JwtStrategy],
 })
 export class AuthModule {}

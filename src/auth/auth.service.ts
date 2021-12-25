@@ -13,6 +13,21 @@ export class AuthService {
     @InjectModel(User.name) private userRepo: Model<UserDocument>,
   ) {}
 
+  async verify(token: string) {
+    if (!token) return false;
+
+    token = token.replace('Bearer ', '');
+
+    try {
+      return await this.jwtService.verifyAsync(token, {
+        secret: 'jwtSecret',
+      });
+    } catch (err) {
+      console.error('Attempted to verify invalid token:', token, err.message);
+      return false;
+    }
+  }
+
   async validateUser(details: UserDetails) {
     const { _id } = details;
     let user = await this.userRepo.findById(_id);

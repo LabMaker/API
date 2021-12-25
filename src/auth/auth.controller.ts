@@ -10,13 +10,11 @@ import {
 import { Request, Response } from 'express';
 import { DiscordAuthGuard } from './guards/DiscordAuth.guard';
 import { AuthenticationProvider } from './auth.interface';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject('AUTH_SERVICE')
-    private readonly authService: AuthenticationProvider,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Get('login')
   @UseGuards(DiscordAuthGuard)
