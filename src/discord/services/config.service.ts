@@ -4,13 +4,17 @@ import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
 import { DiscordConfig } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CurrentUser } from '../../utils/getUser.decorator';
+import { UserDetails } from '../../auth/userDetails.dto';
 
 @Injectable()
 export class ConfigService implements IDiscordConfig {
   constructor(private prismaService: PrismaService) {}
   private readonly logger = new Logger(ConfigService.name);
 
-  async getConfig(id: string): Promise<DiscordConfig> {
+  async getConfig(id: string, user: UserDetails): Promise<DiscordConfig> {
+    //Authorization Requires More information (need to call discord API )
+    //And see if user can access server
     this.logger.log('Client Requesting Config');
     const config = await this.prismaService.discordConfig.findUnique({
       where: { id },

@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RedditConfig } from '@prisma/client';
+import { JwtAuthGuard } from '../../auth/guards/Jwt.guard';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
-import { JwtAuthGuard } from '../../utils/guards/Jwt.guard';
 import {
   CreateConfigDto,
   UpdateConfigDto,

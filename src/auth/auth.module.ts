@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DiscordStrategy } from './strategy/discord.strategy';
-import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtBotStrategy, JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -18,6 +18,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     DiscordStrategy,
     { provide: 'AUTH_SERVICE', useClass: AuthService },
     JwtStrategy,
+    JwtBotStrategy,
   ],
 })
 export class AuthModule {}
