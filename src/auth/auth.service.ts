@@ -13,6 +13,21 @@ export class AuthService {
   ) {}
   private readonly logger = new Logger(AuthService.name);
 
+  async verify(token: string) {
+    if (!token) return false;
+
+    token = token.replace('Bearer ', '');
+
+    try {
+      return await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+    } catch (err) {
+      console.error('Attempted to verify invalid token:', token, err.message);
+      return false;
+    }
+  }
+
   async validateUser(details: UserDetails) {
     const { id } = details;
 

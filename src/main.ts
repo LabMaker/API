@@ -1,9 +1,10 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as passport from 'passport';
 import * as cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,8 +19,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   app.use(passport.initialize());
-  await app.listen(process.env.PORT || 3000);
 
+  app.useWebSocketAdapter(new WsAdapter(app));
+
+  await app.listen(process.env.PORT || 3000);
   Logger.log(
     `Launched in ${process.env.ENVIRONMENT || 'DEV'} on ${await app.getUrl()}`,
     'Main',

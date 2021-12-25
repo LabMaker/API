@@ -1,4 +1,3 @@
 {
-  "bloop.openOnSuggestionsAvailable": false,
   "typescript.preferences.importModuleSpecifier": "relative"
 }

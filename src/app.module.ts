@@ -4,6 +4,7 @@ import { RedditModule } from './reddit/reddit.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { PayModule } from './pay/pay.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 let envFilePath = '.env.development';
@@ -21,6 +22,7 @@ Logger.log(`Running in ${process.env.ENVIRONMENT}`);
     RedditModule,
     AuthModule,
     UserModule,
+    PayModule,
     PrismaModule,
   ],
   controllers: [],
