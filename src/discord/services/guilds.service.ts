@@ -7,12 +7,16 @@ import { UserService } from '../../user/user.service';
 import { IGuild } from '../interfaces/guild.interface';
 import { DiscordConfig } from '.prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PaymentService } from './payment.service';
+import { IPaymentService } from '../interfaces/payment.interface';
 
 @Injectable()
 export class GuildsService implements IGuild {
   constructor(
     private prismaService: PrismaService,
     private userService: UserService,
+    @Inject('PAYMENT_SERVICE')
+    private readonly paymentService: IPaymentService,
     @Inject(HttpService) private readonly httpService: HttpService,
   ) {}
 
@@ -86,9 +90,7 @@ export class GuildsService implements IGuild {
     });
     if (!config) return;
 
-    const payments = await this.prismaService.payment.findMany({
-      where: { serverId: config.paymentConfigId },
-    });
+    const payments = await this.paymentService.getPayments(serverId);
 
     return {
       config,

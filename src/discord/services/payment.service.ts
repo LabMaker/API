@@ -16,7 +16,19 @@ export class PaymentService implements IPaymentService {
   private readonly logger = new Logger(PaymentService.name);
 
   async getPayments(serverId: string): Promise<Payment[]> {
-    return await this.prismaService.payment.findMany({ where: { serverId } });
+    return await this.prismaService.payment.findMany({
+      where: { serverId },
+      orderBy: {
+        type: 'asc',
+      },
+    });
+
+    // const groupedPayments = await this.prismaService.payment.groupBy({
+    //   by: ['type'],
+    //   where: { serverId },
+    // });
+
+    // return groupedPayments;
   }
 
   async createPayments(

@@ -46,7 +46,7 @@ export class AuthService {
 
   async refreshToken(res: Response, req: Request) {
     const token = req.cookies.jid;
-    this.logger.log(`Refresh Token - Auth Service ${token}`);
+    this.logger.log(`Refresh Token - Auth Service`);
 
     if (!token) {
       this.logger.warn(`Empty Token`);
