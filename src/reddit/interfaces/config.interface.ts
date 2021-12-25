@@ -7,7 +7,7 @@ import {
 
 export interface IRedditConfig {
   getConfig(id: number): Promise<RedditConfig>;
-  getConfigs(user: UserDetails): Promise<RedditConfig[]>;
+  getConfigs(): Promise<RedditConfig[]>;
   createConfig(guildConfigDto: CreateConfigDto): Promise<RedditConfig>;
   updateConfig(
     updateConfigDto: UpdateConfigDto,

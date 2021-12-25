@@ -46,8 +46,7 @@ export class ConfigService implements IRedditConfig {
     });
   }
 
-  async getConfigs(user: UserDetails): Promise<RedditConfig[]> {
-    if (user.type !== 'Bot') throw new UnauthorizedException();
+  async getConfigs(): Promise<RedditConfig[]> {
     this.logger.log('Reddit Bot Client Requesting Configs');
 
     return await this.prismaService.redditConfig.findMany();

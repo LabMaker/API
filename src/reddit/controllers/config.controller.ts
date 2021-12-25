@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RedditConfig } from '@prisma/client';
-import { JwtAuthGuard } from '../../auth/guards/Jwt.guard';
+import { JwtAuthGuard, JwtBotAuthGuard } from '../../auth/guards/Jwt.guard';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
 import {
@@ -33,9 +33,9 @@ export class ConfigController {
   }
 
   @Get('')
-  @UseGuards(JwtAuthGuard)
-  getAll(@CurrentUser() user: UserDetails): Promise<RedditConfig[]> {
-    return this.configService.getConfigs(user);
+  @UseGuards(JwtBotAuthGuard)
+  getAll(): Promise<RedditConfig[]> {
+    return this.configService.getConfigs();
   }
 
   @Post()
