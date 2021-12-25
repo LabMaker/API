@@ -150,6 +150,9 @@ export class PayPalService {
     // Return checkout link if it exists
     let checkoutLink = order.links.find((e) => e.rel == 'approve').href;
     if (checkoutLink) {
+      this.logger.log(
+        `Created checkout link for order valued at $${price}: ${checkoutLink}`,
+      );
       return { url: checkoutLink };
     } else {
       this.logger.warn(
