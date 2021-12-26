@@ -13,10 +13,9 @@ import {
   CreateConfigDto,
   UpdateConfigDto,
 } from '../dtos/create-redditconfig.dto';
-import { IRedditConfig } from '../interfaces/config.interface';
 
 @Injectable()
-export class ConfigService implements IRedditConfig {
+export class ConfigService {
   constructor(
     private prismaService: PrismaService,
     @Inject(HttpService) private readonly httpService: HttpService,

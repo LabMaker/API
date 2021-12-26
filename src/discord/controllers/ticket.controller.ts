@@ -10,13 +10,11 @@ import {
 } from '@nestjs/common';
 import { Ticket } from '@prisma/client';
 import { CreateTicketDto, UpdateTicketDto } from '../dtos/create-ticket.dto';
-import { ITicketService } from '../interfaces/ticket.interface';
+import { TicketService } from '../services/ticket.service';
 
 @Controller('discord/ticket')
 export class TicketController {
-  constructor(
-    @Inject('TICKET_SERVICE') private readonly ticketService: ITicketService,
-  ) {}
+  constructor(private readonly ticketService: TicketService) {}
 
   @Get('/:serverId/:ticketId')
   getTicket(

@@ -8,19 +8,16 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { IDiscordConfig } from '../interfaces/config.interface';
 import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { DiscordConfig } from '@prisma/client';
 import { JwtAuthGuard, JwtBotAuthGuard } from '../../auth/guards/Jwt.guard';
 import { CurrentUser } from '../../utils/getUser.decorator';
 import { UserDetails } from '../../auth/userDetails.dto';
+import { ConfigService } from '../services/config.service';
 
 @Controller('discord/config')
 export class ConfigController {
-  constructor(
-    @Inject('DISCORD_CONFIG_SERVICE')
-    private readonly configService: IDiscordConfig,
-  ) {}
+  constructor(private readonly configService: ConfigService) {}
 
   private context = 'DiscordConfigController';
 

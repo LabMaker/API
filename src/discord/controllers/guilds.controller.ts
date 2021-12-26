@@ -1,16 +1,13 @@
-import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { Guild } from '../dtos/Guild.dto';
 import { CurrentUser } from '../../utils/getUser.decorator';
-import { IGuild } from '../interfaces/guild.interface';
 import { JwtAuthGuard } from '../../auth/guards/Jwt.guard';
+import { GuildsService } from '../services/guilds.service';
 
 @Controller('discord/guilds')
 export class GuildsController {
-  constructor(
-    @Inject('GUILD_SERVICE')
-    private readonly guildService: IGuild,
-  ) {}
+  constructor(private readonly guildService: GuildsService) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)

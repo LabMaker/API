@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { Log } from '@prisma/client';
 import { CreateLogDto } from '../dtos/create-log.dto';
-import { ILog } from '../interfaces/log.interface';
+import { LogsService } from '../services/logs.service';
 
 export type LogQueryParms = {
   pmOnly: boolean;
@@ -9,7 +9,7 @@ export type LogQueryParms = {
 
 @Controller('reddit/log')
 export class LogsController {
-  constructor(@Inject('LOG_SERVICE') private readonly logService: ILog) {}
+  constructor(private readonly logService: LogsService) {}
 
   @Get('/:id')
   getLog(@Param('id') nodeId: number): Promise<Log[]> {

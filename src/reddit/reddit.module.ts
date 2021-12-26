@@ -7,16 +7,7 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [HttpModule],
-  providers: [
-    {
-      provide: 'REDDIT_CONFIG_SERVICE',
-      useClass: ConfigService,
-    },
-    {
-      provide: 'LOG_SERVICE',
-      useClass: LogsService,
-    },
-  ],
+  providers: [ConfigService, LogsService],
   controllers: [ConfigController, LogsController],
 })
 export class RedditModule {}

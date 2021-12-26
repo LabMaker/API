@@ -4,19 +4,15 @@ import { lastValueFrom } from 'rxjs';
 import { UserDetails } from '../../auth/userDetails.dto';
 import { Guild } from '../dtos/Guild.dto';
 import { UserService } from '../../user/user.service';
-import { IGuild } from '../interfaces/guild.interface';
-import { DiscordConfig } from '.prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PaymentService } from './payment.service';
-import { IPaymentService } from '../interfaces/payment.interface';
 
 @Injectable()
-export class GuildsService implements IGuild {
+export class GuildsService {
   constructor(
     private prismaService: PrismaService,
     private userService: UserService,
-    @Inject('PAYMENT_SERVICE')
-    private readonly paymentService: IPaymentService,
+    private readonly paymentService: PaymentService,
     @Inject(HttpService) private readonly httpService: HttpService,
   ) {}
 

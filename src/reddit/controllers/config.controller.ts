@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   Post,
   Put,
@@ -11,20 +10,15 @@ import {
 } from '@nestjs/common';
 import { RedditConfig } from '@prisma/client';
 import { JwtAuthGuard, JwtBotAuthGuard } from '../../auth/guards/Jwt.guard';
-import { UserDetails } from '../../auth/userDetails.dto';
-import { CurrentUser } from '../../utils/getUser.decorator';
 import {
   CreateConfigDto,
   UpdateConfigDto,
 } from '../dtos/create-redditconfig.dto';
-import { IRedditConfig } from '../interfaces/config.interface';
+import { ConfigService } from '../services/config.service';
 
 @Controller('reddit/config')
 export class ConfigController {
-  constructor(
-    @Inject('REDDIT_CONFIG_SERVICE')
-    private readonly configService: IRedditConfig,
-  ) {}
+  constructor(private readonly configService: ConfigService) {}
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)

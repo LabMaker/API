@@ -3,25 +3,20 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
 import { Payment } from '@prisma/client';
 import {
-  CreatePaymentDto,
   CreatePaymentDtoArray,
   UpdatePaymentDtoArray,
 } from '../dtos/create-payment.dto';
-import { IPaymentService } from '../interfaces/payment.interface';
+import { PaymentService } from '../services/payment.service';
 
 @Controller('discord/payment')
 export class PaymentController {
-  constructor(
-    @Inject('PAYMENT_SERVICE')
-    private readonly paymentService: IPaymentService,
-  ) {}
+  constructor(private readonly paymentService: PaymentService) {}
 
   @Get('/:id')
   getPayments(@Param('id') serverId: string): Promise<Payment[]> {
@@ -41,7 +36,7 @@ export class PaymentController {
   }
 
   @Delete()
-  deletePayments(@Body() body: any): Promise<Payment[]> {
+  deletePayments(@Body() body: any): Promise<void> {
     return this.paymentService.deletePayments(body);
   }
 }

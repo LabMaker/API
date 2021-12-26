@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLogDto } from '../dtos/create-log.dto';
-import { ILog } from '../interfaces/log.interface';
 import { LogQueryParms } from '../controllers/logs.controller';
 import { Log } from '.prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
-export class LogsService implements ILog {
+export class LogsService {
   constructor(private prismaService: PrismaService) {}
 
   async getLogs(nodeId: number): Promise<Log[]> {

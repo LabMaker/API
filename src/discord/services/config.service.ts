@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IDiscordConfig } from '../interfaces/config.interface';
 import { CreateConfigDto } from '../dtos/create-guildconfig.dto';
 import { UpdateConfigDto } from '../dtos/update-guildconfig.dto';
 import { DiscordConfig } from '@prisma/client';
@@ -8,7 +7,7 @@ import { CurrentUser } from '../../utils/getUser.decorator';
 import { UserDetails } from '../../auth/userDetails.dto';
 
 @Injectable()
-export class ConfigService implements IDiscordConfig {
+export class ConfigService {
   constructor(private prismaService: PrismaService) {}
   private readonly logger = new Logger(ConfigService.name);
 
