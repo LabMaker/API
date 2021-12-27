@@ -15,12 +15,14 @@ import PayGatewayMessage from './dtos/PayGatewayMessage.dto';
 @WebSocketGateway({ namespace: 'payments' })
 // @WebSocketGateway()
 export class PayGateway implements OnGatewayInit, OnGatewayConnection {
-  constructor() {}
+  constructor(private authService: AuthService) {}
 
   @WebSocketServer() server: Server;
 
-  handleConnection(client: any, ...args: any[]) {
-    console.log('connected');
+  async handleConnection(client: any, ...args: any[]) {
+    const token = client.handshake.headers.authorization.split(' ')[1];
+    const result = await this.authService.verify(token);
+    !result && client.disconnect();
   }
 
   afterInit(server: any) {
@@ -28,9 +30,7 @@ export class PayGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   public notifyAll(msg: PayGatewayMessage) {
-    this.server.clients.forEach((client) => {
-      client.send(JSON.stringify(msg));
-    });
+    this.server.emit(JSON.stringify(msg));
   }
 
   @UseGuards(WSGuard)

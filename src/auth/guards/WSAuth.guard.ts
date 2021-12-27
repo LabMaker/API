@@ -15,7 +15,6 @@ export class WSGuard implements CanActivate {
 
   async canActivate(context: any): Promise<boolean | any> {
     const token = context.args[0].handshake.headers.authorization.split(' ')[1];
-
     if (!token) return false;
     const result = await this.authService.verify(token);
 
