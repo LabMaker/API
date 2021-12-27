@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import * as passport from 'passport';
 import * as cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { WsAdapter } from '@nestjs/platform-ws';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,7 +20,7 @@ async function bootstrap() {
 
   app.use(passport.initialize());
 
-  app.useWebSocketAdapter(new WsAdapter(app));
+  // app.useWebSocketAdapter(new IoAdapter(app));
 
   await app.listen(process.env.PORT || 3000);
   Logger.log(

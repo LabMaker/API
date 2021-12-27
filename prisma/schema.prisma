@@ -35,6 +35,7 @@ model RedditConfig {
   blockedUsers   String[]
   userId         String
   nodeEditors    String[]
+  delay          Int      @default(60)
   creator        User     @relation(fields: [userId], references: [id])
   logs           Log[]
 }

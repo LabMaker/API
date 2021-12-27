@@ -13,11 +13,13 @@ import {
   CreateConfigDto,
   UpdateConfigDto,
 } from '../dtos/create-redditconfig.dto';
+import { RedditGateway } from '../reddit.gateway';
 
 @Injectable()
 export class ConfigService {
   constructor(
     private prismaService: PrismaService,
+    private readonly redditGateway: RedditGateway,
     @Inject(HttpService) private readonly httpService: HttpService,
   ) {}
   private readonly logger = new Logger(ConfigService.name);
@@ -46,17 +48,17 @@ export class ConfigService {
   }
 
   async getConfigs(): Promise<RedditConfig[]> {
-    this.logger.log('Reddit Bot Client Requesting Configs');
-
     return await this.prismaService.redditConfig.findMany();
   }
 
   async createConfig(newConfig: CreateConfigDto): Promise<RedditConfig> {
     this.logger.log(JSON.stringify(newConfig));
     try {
-      return await this.prismaService.redditConfig.create({
+      const config = await this.prismaService.redditConfig.create({
         data: newConfig,
       });
+      this.redditGateway.notifyConfig(config);
+      return config;
     } catch (err) {
       this.logger.error(err);
       return;
@@ -68,21 +70,32 @@ export class ConfigService {
     ucd.nodeEditors = ucd.nodeEditors.filter((userId) => userId !== ucd.userId);
 
     ucd.nodeEditors = [...new Set(ucd.nodeEditors)];
-    return await this.prismaService.redditConfig.update({
+    const config = await this.prismaService.redditConfig.update({
       where: filter,
       data: ucd,
     });
+
+    if (config) {
+      this.redditGateway.notifyConfig(config);
+      return config;
+    }
   }
 
   async updateMessage(id: number, message: string): Promise<any> {
-    return await this.prismaService.redditConfig.update({
+    const config = await this.prismaService.redditConfig.update({
       where: { id },
       data: { pmBody: message },
     });
+
+    if (config) {
+      this.redditGateway.notifyConfig(config);
+      return config;
+    }
   }
 
   async deleteConfig(id: number): Promise<any> {
     await this.prismaService.redditConfig.delete({ where: { id } });
+    this.redditGateway.notifyDelete(id);
     return;
   }
 
