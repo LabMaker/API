@@ -1,4 +1,7 @@
+import { UseGuards } from '@nestjs/common';
 import {
+  OnGatewayConnection,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -6,26 +9,31 @@ import {
 import { IncomingMessage } from 'http';
 import { Server } from 'ws';
 import { AuthService } from '../auth/auth.service';
+import { WSGuard } from '../auth/guards/WSAuth.guard';
 import PayGatewayMessage from './dtos/PayGatewayMessage.dto';
 
-@WebSocketGateway()
-export class PayGateway {
-  @WebSocketServer() server: Server;
-
+@WebSocketGateway({ namespace: 'payments' })
+// @WebSocketGateway()
+export class PayGateway implements OnGatewayInit, OnGatewayConnection {
   constructor(private authService: AuthService) {}
 
-  async handleConnection(socket: WebSocket, msg: IncomingMessage) {
-    const payload = await this.authService.verify(msg.headers.authorization);
+  @WebSocketServer() server: Server;
 
-    if (!payload) socket.close();
+  async handleConnection(client: any, ...args: any[]) {
+    const token = client.handshake.headers.authorization.split(' ')[1];
+    const result = await this.authService.verify(token);
+    !result && client.disconnect();
+  }
+
+  afterInit(server: any) {
+    console.log('Connected');
   }
 
   public notifyAll(msg: PayGatewayMessage) {
-    this.server.clients.forEach((client) => {
-      client.send(JSON.stringify(msg));
-    });
+    this.server.emit(JSON.stringify(msg));
   }
 
+  @UseGuards(WSGuard)
   @SubscribeMessage('pay')
   handleMessage(client: any, payload: any): string {
     return 'Hello sir';
