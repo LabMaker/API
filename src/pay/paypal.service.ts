@@ -88,6 +88,7 @@ export class PayPalService {
     price: number,
   ): Promise<{ url: string }> {
     if (isNaN(price)) {
+      Logger.log('Throwing Error for invalid price');
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
@@ -101,7 +102,9 @@ export class PayPalService {
     const ticket = await this.prismaService.ticket.findFirst({
       where: { channelId: channelId },
     });
+    console.log(channelId);
     if (!ticket) {
+      Logger.log('Throwing Error for ticket');
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,

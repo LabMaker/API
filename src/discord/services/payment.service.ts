@@ -5,13 +5,12 @@ import {
   UpdatePaymentDto,
   UpdatePaymentDtoArray,
 } from '../dtos/create-payment.dto';
-import { IPaymentService } from '../interfaces/payment.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { Payment } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
-export class PaymentService implements IPaymentService {
+export class PaymentService {
   constructor(private prismaService: PrismaService) {}
   private readonly logger = new Logger(PaymentService.name);
 
@@ -67,7 +66,7 @@ export class PaymentService implements IPaymentService {
     return savedPayments;
   }
 
-  async deletePayments(deleteIds: number[]) {
+  async deletePayments(deleteIds: number[]): Promise<void> {
     deleteIds.forEach(
       async (id) => await this.prismaService.payment.delete({ where: { id } }),
     );

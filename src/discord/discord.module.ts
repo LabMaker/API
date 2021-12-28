@@ -18,23 +18,6 @@ import { GuildsService } from './services/guilds.service';
     PaymentController,
     GuildsController,
   ],
-  providers: [
-    {
-      provide: 'DISCORD_CONFIG_SERVICE',
-      useClass: ConfigService,
-    },
-    {
-      provide: 'TICKET_SERVICE',
-      useClass: TicketService,
-    },
-    {
-      provide: 'PAYMENT_SERVICE',
-      useClass: PaymentService,
-    },
-    {
-      provide: 'GUILD_SERVICE',
-      useClass: GuildsService,
-    },
-  ],
+  providers: [ConfigService, TicketService, PaymentService, GuildsService],
 })
 export class DiscordModule {}

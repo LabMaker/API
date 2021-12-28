@@ -3,28 +3,22 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
 import { RedditConfig } from '@prisma/client';
-import { JwtAuthGuard } from '../../auth/guards/Jwt.guard';
-import { UserDetails } from '../../auth/userDetails.dto';
-import { CurrentUser } from '../../utils/getUser.decorator';
+import { JwtAuthGuard, JwtBotAuthGuard } from '../../auth/guards/Jwt.guard';
 import {
   CreateConfigDto,
   UpdateConfigDto,
 } from '../dtos/create-redditconfig.dto';
-import { IRedditConfig } from '../interfaces/config.interface';
+import { ConfigService } from '../services/config.service';
 
 @Controller('reddit/config')
 export class ConfigController {
-  constructor(
-    @Inject('REDDIT_CONFIG_SERVICE')
-    private readonly configService: IRedditConfig,
-  ) {}
+  constructor(private readonly configService: ConfigService) {}
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
@@ -33,9 +27,9 @@ export class ConfigController {
   }
 
   @Get('')
-  @UseGuards(JwtAuthGuard)
-  getAll(@CurrentUser() user: UserDetails): Promise<RedditConfig[]> {
-    return this.configService.getConfigs(user);
+  @UseGuards(JwtBotAuthGuard)
+  getAll(): Promise<RedditConfig[]> {
+    return this.configService.getConfigs();
   }
 
   @Post()

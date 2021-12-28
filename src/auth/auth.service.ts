@@ -4,6 +4,7 @@ import { Response, Request } from 'express';
 import { User } from '.prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class AuthService {
@@ -16,14 +17,13 @@ export class AuthService {
   async verify(token: string) {
     if (!token) return false;
 
-    token = token.replace('Bearer ', '');
-
     try {
       return await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
     } catch (err) {
-      console.error('Attempted to verify invalid token:', token, err.message);
+      // console.error('Attempted to verify invalid token:', token, err.message);
+      // throw new WsException('Invalid Token');
       return false;
     }
   }
